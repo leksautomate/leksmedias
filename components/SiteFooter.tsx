@@ -28,7 +28,24 @@ export function SiteFooter() {
             </li>
           </ul>
         </div>
-        <p className="mt-12 max-w-3xl text-xs leading-relaxed text-mute">
+        <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-2 border-t border-line pt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-mute">
+          <li>
+            <Link href="/terms" className="hover:text-white">
+              Terms
+            </Link>
+          </li>
+          <li>
+            <Link href="/privacy" className="hover:text-white">
+              Privacy
+            </Link>
+          </li>
+          <li>
+            <Link href="/refunds" className="hover:text-white">
+              Refunds
+            </Link>
+          </li>
+        </ul>
+        <p className="mt-6 max-w-3xl text-xs leading-relaxed text-mute">
           © {new Date().getFullYear()} {SITE.name}. Research powered by TinyFish. {SITE.name} is an independent product
           and is not affiliated with or endorsed by TinyFish. Other product names belong to their owners.
         </p>

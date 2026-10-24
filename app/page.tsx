@@ -8,6 +8,7 @@ import { PricingTable } from "@/components/PricingTable";
 import { SampleTabs } from "@/components/SampleTabs";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { REFUND } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 
 const PILLARS = [
@@ -201,6 +202,10 @@ const HOME_FAQ = [
   {
     q: "Can I use my own AI agent instead?",
     a: "That is on the roadmap for paid plans. You will connect Leksmedia to Claude Code, Codex, Antigravity, Hermes or any agent that supports MCP. Your agent calls our research, writing rules and checks, and writes with your own subscription.",
+  },
+  {
+    q: "Is there a refund?",
+    a: `Yes. If a paid plan is not right for you, we refund your first payment within ${REFUND.monthlyDays} days (${REFUND.yearlyDays} days for a yearly plan) as long as you have used ${REFUND.maxUsedPercent}% or less of its credits. Credits for a run that fails come back automatically. The full refund policy is linked in the footer.`,
   },
   {
     q: "Which topics work best?",

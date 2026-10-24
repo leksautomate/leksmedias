@@ -12,6 +12,7 @@ This repo currently contains the **landing page** and **pricing page**. The plan
 | [`ADMIN.md`](docs/ADMIN.md) | Admin area plan |
 | [`UX.md`](docs/UX.md) | User experience plan |
 | [`MCP.md`](docs/MCP.md) | Use from Claude Code, Codex, Antigravity, Hermes and other agents |
+| [`LEGAL.md`](docs/LEGAL.md) | Terms, Privacy and Refund pages: what to fill in and what to decide |
 | [`COPY.md`](docs/COPY.md) | Copywriting notes: positioning, claims policy, how to earn real retention stats |
 
 Re-run the cost model any time prices change: `python3 docs/cost-model.py`.

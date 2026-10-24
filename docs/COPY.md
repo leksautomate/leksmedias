@@ -92,6 +92,6 @@ Sub-headline themes: sources, two versions, long-form, no setup.
 ## 8. Open copy questions
 
 1. Use "Leksmedia" (matches the live site) or "leksmedias" (matches the domain) in the wordmark?
-2. Will there be a refund policy? The page says nothing about one on purpose.
+2. Refund policy: a draft now exists (7 / 14 day first-payment guarantee, 20% usage limit). See [`LEGAL.md`](LEGAL.md) and change it if you want a different promise.
 3. Do you want a case-study slot ready for the beta results (hidden until there are real ones)?
 4. Which proof matters most to your buyers: retention, time saved, or fact accuracy?

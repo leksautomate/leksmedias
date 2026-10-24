@@ -1,3 +1,5 @@
+import { REFUND } from "@/lib/legal";
+
 // One balance: credits. A script costs credits by word count, deep research costs credits per run.
 // Sized from real provider prices. See docs/COSTS.md and docs/cost-model.py.
 export type PlanId = "free" | "starter" | "creator" | "pro" | "studio";
@@ -191,6 +193,10 @@ export const PRICING_FAQ = [
   {
     q: "What happens if a run fails?",
     a: "You are only charged for scripts that finish. If research or writing fails part way, the credits for that job go back to your balance.",
+  },
+  {
+    q: "Can I get a refund?",
+    a: `Yes. Your first payment on a paid plan is refundable within ${REFUND.monthlyDays} days (${REFUND.yearlyDays} days for a yearly plan) if you have used ${REFUND.maxUsedPercent}% or less of its credits. If a plan renews by accident, tell us within ${REFUND.renewalWindowHours} hours. Credits for failed runs return automatically. See the refund policy in the footer for the details.`,
   },
   {
     q: "Do unused credits roll over?",
