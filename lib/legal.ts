@@ -4,8 +4,8 @@ import { SITE } from "@/lib/site";
 // shows as a highlighted [placeholder] so it cannot be missed before launch.
 export const LEGAL = {
   product: SITE.name,
-  /** Legal name of the company that runs the service, e.g. "Leksmedia LLC". */
-  entity: "Leksmedias (operated by Babatude Lekan)",
+  /** Who runs the service. A sole trader uses "Full Name, trading as Business Name". */
+  entity: "Babatude Lekan, trading as Leksmedias",
   /** Registered or mailing address. */
   address: "",
   /** Support and privacy contact. */

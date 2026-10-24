@@ -10,8 +10,8 @@ Anything left empty shows on the page as a gold `[placeholder]`, so it is hard t
 
 | Setting | What to put |
 | --- | --- |
-| `entity` | **Done:** "Leksmedias (operated by Babatude Lekan)". If Leksmedias is a registered company, replace this with its exact registered name (for example "Leksmedias Ltd"). Trading as a person or sole proprietor means you are personally liable, so a company is worth setting up |
-| `address` | **Still needed.** Registered or mailing address (the law in many countries requires one) |
+| `entity` | **Done:** "Babatude Lekan, trading as Leksmedias" (sole trader, no registered company). See section 6 for what that means |
+| `address` | **Still needed.** A mailing address where you can receive post. As a sole trader, do not publish your home address unless you are happy for it to be public: use a PO box, a virtual mailbox or a business address instead |
 | `email` | **Done:** support@leksmedias.com. Make sure this mailbox exists and is monitored, because the privacy and refund pages tell people to write to it |
 | `jurisdiction` | **Still needed.** Governing law and courts, for example "England and Wales" or "the State of Delaware, USA". Use where the business is based or registered |
 
@@ -58,3 +58,11 @@ Writing a promise on a legal page makes it a legal commitment. Before launch the
 ## 5. Not covered here (probably needed later)
 
 Cookie banner (if non-essential cookies are added), data processing agreement for agency customers, an acceptable-use appeal process, DMCA or copyright complaint contact, a security disclosure page, and an AI-disclosure line if platforms require it for published videos.
+
+## 6. Because you are a sole trader (no registered company)
+
+- **You are personally liable.** The Terms cap what customers can claim from you, but a cap does not protect your personal assets against everything (fraud, some consumer claims, tax). This matters more here than for most products because you publish AI-written text about real people. Consider an LLC, Ltd or equivalent once there is revenue, and keep business insurance in mind. When you register one, change `entity` in `lib/legal.ts` and email customers about the change.
+- **Your name is public.** The pages show "Babatude Lekan, trading as Leksmedias". Many laws require the seller's identity on the site, so this is normal, but it is a choice about privacy.
+- **Business registration and tax.** Check what your country requires to trade under a business name and to charge VAT or sales tax. Stripe accepts individuals and sole proprietors, but you will need to complete its identity and tax setup.
+- **Use a separate bank account** for the business, even if it is in your own name. It keeps refunds, tax and records clean.
+- **Data protection still applies in full.** Being an individual does not exempt you from privacy laws such as GDPR when customers are in the EU or UK. The Privacy Policy and the deletion and export promises in section 3 still have to be real.
