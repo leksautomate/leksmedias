@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getDb } from "@/db";
+import { waitlist } from "@/db/schema";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -21,23 +23,37 @@ export async function POST(req: Request) {
   }
   const source = typeof body.source === "string" ? body.source.slice(0, 40) : "unknown";
 
-  const hook = process.env.WAITLIST_WEBHOOK_URL;
-  if (!hook) {
-    if (process.env.NODE_ENV === "production") {
-      return NextResponse.json({ error: "Sign-ups are not available right now." }, { status: 503 });
+  let saved = false;
+  if (process.env.DATABASE_URL) {
+    try {
+      // Signing up twice is fine: the second time changes nothing.
+      await getDb().insert(waitlist).values({ email, source }).onConflictDoNothing();
+      saved = true;
+    } catch (err) {
+      console.error("waitlist: database insert failed", err);
     }
-    console.log("[waitlist:dev]", { email, source });
-    return NextResponse.json({ ok: true });
   }
 
-  try {
-    const res = await fetch(hook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, source, at: new Date().toISOString() }),
-    });
-    if (!res.ok) throw new Error(`webhook ${res.status}`);
-  } catch {
+  const hook = process.env.WAITLIST_WEBHOOK_URL;
+  if (hook) {
+    try {
+      const res = await fetch(hook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source, at: new Date().toISOString() }),
+      });
+      if (!res.ok) throw new Error(`webhook ${res.status}`);
+      saved = true;
+    } catch (err) {
+      console.error("waitlist: webhook failed", err);
+    }
+  }
+
+  if (!saved) {
+    if (process.env.NODE_ENV !== "production" && !process.env.DATABASE_URL) {
+      console.log("[waitlist:dev]", { email, source });
+      return NextResponse.json({ ok: true });
+    }
     return NextResponse.json({ error: "Could not save your email. Please try again." }, { status: 502 });
   }
   return NextResponse.json({ ok: true });

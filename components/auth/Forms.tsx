@@ -95,8 +95,8 @@ export function SignupForm() {
   }
   return (
     <form action={action} className="space-y-5">
-      <Field label="Name (optional)" name="name" autoComplete="name" required={false} />
-      <Field label="Email" name="email" type="email" autoComplete="email" />
+      <Field label="Name (optional)" name="name" autoComplete="name" required={false} defaultValue={state.name} />
+      <Field label="Email" name="email" type="email" autoComplete="email" defaultValue={state.email} />
       <Field label="Password" name="password" type="password" autoComplete="new-password" minLength={10} hint="At least 10 characters." />
       <input name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 opacity-0" />
       <label className="flex items-start gap-3 text-sm leading-relaxed text-soft">
@@ -129,7 +129,7 @@ export function LoginForm({ next, resetDone }: { next?: string; resetDone?: bool
         </p>
       )}
       <input type="hidden" name="next" value={next ?? ""} />
-      <Field label="Email" name="email" type="email" autoComplete="email" />
+      <Field label="Email" name="email" type="email" autoComplete="email" defaultValue={state.email} />
       <Field label="Password" name="password" type="password" autoComplete="current-password" />
       <p className="-mt-2 text-right text-sm">
         <Link href="/forgot" className="text-soft underline underline-offset-4 hover:text-white">
@@ -154,7 +154,7 @@ export function ForgotForm() {
   }
   return (
     <form action={action} className="space-y-5">
-      <Field label="Email" name="email" type="email" autoComplete="email" />
+      <Field label="Email" name="email" type="email" autoComplete="email" defaultValue={state.email} />
       <Status state={state} />
       <Submit>Send reset link</Submit>
     </form>

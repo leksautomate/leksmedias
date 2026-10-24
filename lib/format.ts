@@ -1,0 +1,17 @@
+export const num = (n: number) => n.toLocaleString("en-US");
+
+export function ago(date: Date, now = new Date()): string {
+  const s = Math.max(0, Math.round((now.getTime() - date.getTime()) / 1000));
+  if (s < 60) return "just now";
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} hr ago`;
+  const d = Math.round(h / 24);
+  if (d < 30) return `${d} day${d === 1 ? "" : "s"} ago`;
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+}
+
+export function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "script";
+}

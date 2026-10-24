@@ -120,10 +120,15 @@ describe("AnthropicProvider", () => {
 });
 
 describe("TinyFishProvider", () => {
-  const mk = (replies: Reply[], opts: { pollMs?: number; researchDeadlineMs?: number } = {}) => {
+  const mk = (replies: Reply[], opts: { pollMs?: number; researchDeadlineMs?: number; realSleep?: boolean } = {}) => {
     const s = scripted(replies);
     const sleeps: number[] = [];
-    const p = new TinyFishProvider({ apiKey: "tf-key", fetchImpl: s.impl, sleep: async (ms) => void sleeps.push(ms), pollMs: 10, ...opts });
+    const { realSleep, ...rest } = opts;
+    const sleep = async (ms: number) => {
+      sleeps.push(ms);
+      if (realSleep) await new Promise((r) => setTimeout(r, ms));
+    };
+    const p = new TinyFishProvider({ apiKey: "tf-key", fetchImpl: s.impl, sleep, pollMs: 10, ...rest });
     return { p, ...s, sleeps };
   };
 
@@ -232,8 +237,7 @@ describe("TinyFishProvider", () => {
     });
 
     it("gives up after the deadline", async () => {
-      const { p } = mk([start, running, running, running], { researchDeadlineMs: 1, pollMs: 5 });
-      await new Promise((r) => setTimeout(r, 5));
+      const { p } = mk([start, running, running, running], { researchDeadlineMs: 20, pollMs: 25, realSleep: true });
       await expect(p.deepResearch("t", { mode: "deep", language: "en" })).rejects.toThrow(/longer than/);
     });
   });

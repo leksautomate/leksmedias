@@ -8,10 +8,12 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx db/migrate.ts",
-    "worker": "tsx worker/index.ts",
+    "db:migrate": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local db/migrate.ts",
+    "worker": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local worker/index.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "grant": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/grant-credits.ts",
+    "admin:promote": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/promote-admin.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",

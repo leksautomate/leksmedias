@@ -19,7 +19,8 @@ import { clearSessionCookie, clientIp, readSessionToken, setSessionCookie, userA
 import { emailTokens } from "@/db/schema";
 import { and, desc, eq, gt } from "drizzle-orm";
 
-export type FormState = { error?: string; message?: string; devLink?: string; done?: boolean };
+// email and name are sent back on errors so the form can keep them. React 19 clears uncontrolled fields after an action.
+export type FormState = { error?: string; message?: string; devLink?: string; done?: boolean; email?: string; name?: string };
 
 const Email = z.email("Enter a valid email address.").max(254);
 
@@ -48,7 +49,7 @@ export async function signupAction(_prev: FormState, form: FormData): Promise<Fo
   if (!parsed.success) {
     // A filled honeypot looks like success so bots do not learn anything.
     if (form.get("company")) return { done: true, message: "Check your email to confirm your address." };
-    return { error: parsed.error.issues[0].message };
+    return { error: parsed.error.issues[0].message, email: String(form.get("email") ?? ""), name: String(form.get("name") ?? "") };
   }
   const r = await signup(getDb(), {
     email: parsed.data.email,
@@ -56,7 +57,7 @@ export async function signupAction(_prev: FormState, form: FormData): Promise<Fo
     name: parsed.data.name,
     acceptedTerms: true,
   });
-  if (!r.ok) return { error: r.error };
+  if (!r.ok) return { error: r.error, email: parsed.data.email, name: parsed.data.name };
   return {
     done: true,
     message: `We sent a confirmation link to ${parsed.data.email.trim().toLowerCase()}. Open it to unlock your free credits.`,
@@ -69,9 +70,9 @@ export async function loginAction(_prev: FormState, form: FormData): Promise<For
     email: form.get("email"),
     password: form.get("password"),
   });
-  if (!parsed.success) return { error: "Enter your email and password." };
+  if (!parsed.success) return { error: "Enter your email and password.", email: String(form.get("email") ?? "") };
   const r = await login(getDb(), { ...parsed.data, ip: await clientIp(), userAgent: await userAgent() });
-  if (!r.ok) return { error: r.error };
+  if (!r.ok) return { error: r.error, email: parsed.data.email };
   await setSessionCookie(r.token, r.expiresAt);
   redirect(r.verified ? safeNext(form.get("next")) : "/verify");
 }
@@ -113,7 +114,7 @@ export async function resendVerificationAction(): Promise<FormState> {
 
 export async function forgotAction(_prev: FormState, form: FormData): Promise<FormState> {
   const parsed = Email.safeParse(form.get("email"));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: parsed.error.issues[0].message, email: String(form.get("email") ?? "") };
   const r = await requestPasswordReset(getDb(), parsed.data);
   return { done: true, message: "If that email has an account, a reset link is on its way.", devLink: r.devLink };
 }

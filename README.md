@@ -3,11 +3,13 @@
 Researched faceless YouTube scripts. Type a topic, get a cited script in two versions:
 one with visual cues for the editor, one clean for voiceover with a sources block.
 
-This repo currently contains the **landing page** and **pricing page**. The plans are in `docs/`:
+The landing page, pricing page, legal pages and the **working app** (accounts, credits, research and script pipeline, worker). The docs:
 
 | Doc | What it covers |
 | --- | --- |
-| [`PLAN.md`](docs/PLAN.md) | Product, flow, architecture, roadmap, risks |
+| [`DEPLOY.md`](docs/DEPLOY.md) | Run it on your own server with your own database |
+| [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | How the pieces fit and why a crash cannot lose work or money |
+| [`PLAN.md`](docs/PLAN.md) | Product, flow, roadmap, risks |
 | [`COSTS.md`](docs/COSTS.md) | Real Claude and TinyFish costs, 10,000 and 25,000-word scripts, margins |
 | [`ADMIN.md`](docs/ADMIN.md) | Admin area plan |
 | [`UX.md`](docs/UX.md) | User experience plan |
@@ -17,15 +19,29 @@ This repo currently contains the **landing page** and **pricing page**. The plan
 
 Re-run the cost model any time prices change: `python3 docs/cost-model.py`.
 
-## Run it
+## Run it locally
+
+You need Node 22 and a Postgres. The easiest Postgres is the one in this repo's compose file.
 
 ```bash
 npm install
-cp .env.example .env.local   # optional
-npm run dev                  # http://localhost:3000
-npm run build && npm start   # production
-npm run typecheck
+cp .env.example .env.local        # then set DATABASE_URL and APP_SECRET; keep the demo providers
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d db   # Postgres on 127.0.0.1:5432
+npm run db:migrate
+npm run dev                       # the website, http://localhost:3000
+npm run worker                    # in a second terminal: writes the scripts
 ```
+
+With `LLM_PROVIDER=demo` and `RESEARCH_PROVIDER=demo` (the default) the whole product runs offline and writes clearly labelled placeholder text, so you can try every screen without API keys. Email confirmation links are printed in the terminal and shown on the signup page in development.
+
+```bash
+npm test                          # 124 tests, need a database called leks_test (see vitest.config.mts)
+npm run typecheck
+npm run grant -- you@example.com 1000 "note"   # add credits
+npm run admin:promote -- you@example.com
+```
+
+Deploying on your own server: [`docs/DEPLOY.md`](docs/DEPLOY.md). How it works inside: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Where things live
 
@@ -39,7 +55,7 @@ npm run typecheck
 
 ## Early-access form
 
-Set `WAITLIST_WEBHOOK_URL` to any endpoint that accepts a JSON POST (`{ email, source, at }`),
-for example a Zapier, Make or n8n webhook. In development, with the variable unset, sign-ups are
-logged to the console. In production, with the variable unset, the form returns an error instead
-of silently dropping emails.
+Sign-ups are saved in the Postgres `waitlist` table (duplicates are ignored). Set
+`WAITLIST_WEBHOOK_URL` to also forward each sign-up (`{ email, source, at }`) to a Zapier, Make or
+n8n webhook. In development without a database, sign-ups are logged to the console. In production,
+if nothing could be saved, the form returns an error instead of silently dropping emails.
