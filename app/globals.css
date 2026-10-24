@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+/* Palette and type scale taken from the style reference:
+   red #e50914, near-black #141414, panel greys #232323 / #2d2d2d / #313131 / #3b3b3b,
+   text white / 70% / 50%, border 70% grey. */
+@theme {
+  --color-brand: #e50914;
+  --color-brand-hover: #c11119;
+  --color-ink: #141414;
+  --color-panel: #232323;
+  --color-panel-2: #2d2d2d;
+  --color-panel-3: #313131;
+  --color-panel-4: #3b3b3b;
+  --color-line: rgb(128 128 128 / 0.7);
+  --color-soft: rgb(255 255 255 / 0.7);
+  --color-mute: rgb(255 255 255 / 0.5);
+  --font-sans: "Helvetica Neue", "Segoe UI", Roboto, Ubuntu, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-ink);
+  color: #fff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Netflix-style thick divider between landing sections */
+.divider {
+  border-bottom: 8px solid var(--color-panel);
+}
+
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details[open] .faq-plus {
+  transform: rotate(45deg);
+}
