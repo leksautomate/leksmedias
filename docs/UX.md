@@ -6,7 +6,7 @@ The product has one job: get a creator from a topic to a script they trust, fast
 
 1. **First script in under 5 minutes of effort.** Research takes minutes, but the user's own work should be a topic and two clicks.
 2. **Show the work.** Sources, the fact list and the audit result are visible, not hidden behind a tab nobody opens. Trust is the product.
-3. **No surprise costs.** Show the credit and deep-run cost before every run, and the balance after.
+3. **No surprise costs.** Show the credit cost before every run, and the balance after.
 4. **Never lose work, never lose credits.** Runs survive closing the tab. Failures refund automatically and say so.
 5. **Defaults over decisions.** Smart presets for every field. Advanced options stay folded.
 6. **Honest about limits.** If a topic has few sources, say so before spending credits.
@@ -42,7 +42,7 @@ Single page, five fields visible, rest folded.
 | Research depth | Standard | Deep shown with the time and run cost, disabled with an upgrade nudge if the plan has none |
 | Voice | Channel profile if any | Folded: tone notes, sources to include, things to avoid |
 
-A **live cost line** under the form: "This will use 4 credits and 2 deep runs, about 25 minutes. You have 11 credits and 6 runs left." Changing length or depth updates it instantly. The submit button repeats it: "Write script (4 credits)".
+A **live cost line** under the form: "This will use 2,200 credits (600 for the script, 1,600 for 2 deep research runs), about 25 minutes. You have 6,400 credits left." Changing length or depth updates it instantly. The submit button repeats it: "Write script (2,200 credits)".
 
 Pre-flight check before charging: a quick search tells us if the topic has enough public sources. If not: "We found limited sources for this topic. Continue, narrow it, or add your own links?"
 
@@ -78,7 +78,7 @@ Grid or list of past scripts with topic, format, words, date, and cost. Search, 
 ### 2.9 Upgrade and billing
 - Upgrade prompts appear at the moment of need, never as popups on arrival: when a plan limit blocks a choice ("Scripts over 5,000 words are on Pro"), when credits run low (at 20%), and after a great result.
 - The prompt always shows what they would get and the price, with one button to Stripe checkout and back to exactly where they were.
-- A usage page: credits, deep runs, renewal date, history of every charge and refund. Self-serve cancel, pause, and plan change, with no hidden steps.
+- A usage page: credits, renewal date, history of every charge and refund. Self-serve cancel, pause, and plan change, with no hidden steps.
 
 ### 2.10 Connect your AI agent
 In Settings, an **Integrations** tab: create an API key, copy a ready-made config for Claude Code, Codex, Antigravity or Hermes, and see the agent's recent calls and spend. Detail in [`MCP.md`](MCP.md).
@@ -131,7 +131,7 @@ Instrument events from day one: `brief_started`, `brief_submitted`, `research_ev
 2. Example topics on the empty state vs a blank form.
 3. Showing the live research feed vs a simple progress bar.
 4. Yearly toggle default (yearly vs monthly) on the pricing page.
-5. Free trial of 2 credits vs 3.
+5. Free trial of 300 credits vs 450.
 6. Fact list review shown by default vs behind a link.
 
 ## 11. Build order for the app UX

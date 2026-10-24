@@ -4,7 +4,7 @@ import { Faq } from "@/components/Faq";
 import { PricingTable } from "@/components/PricingTable";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { COMPARISON, CREDIT_RULES, DEEP_PACK, PLANS, PRICING_FAQ, TOP_UP } from "@/lib/pricing";
+import { COMPARISON, CREDIT_RULES, DEEP_RUN_CREDITS, PLANS, PRICING_FAQ, TOP_UP, withDeep } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -50,7 +50,7 @@ export default function PricingPage() {
                 Pay for finished scripts, <em>not for guesses.</em>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg text-soft">
-                One credit is 2,500 words of script. Cited research and both versions are always included.
+                A standard 2,500-word script costs 150 credits. Cited research and both versions are always included.
               </p>
             </div>
             <div className="mt-14">
@@ -61,37 +61,32 @@ export default function PricingPage() {
 
         {/* Credits explainer */}
         <section className="border-t border-line px-5 py-24 sm:px-8">
-          <div className="mx-auto grid max-w-6xl gap-14 lg:grid-cols-2">
+          <div className="mx-auto grid max-w-6xl gap-14 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="min-w-0">
               <p className="eyebrow">Credits</p>
               <h2 className="h-display mt-4 text-4xl">
-                How credits <em>work.</em>
+                What a script <em>costs.</em>
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-soft">
-                One credit pays for a finished script of up to 2,500 words, about 17 minutes of narration. Longer scripts
-                are written section by section and use one credit per section. Standard research and both versions are
-                always included, and failed runs are refunded.
+                Every script costs credits based on its length. Standard research and both versions are always
+                included, and failed runs are refunded.
               </p>
               <p className="mt-4 leading-relaxed text-soft">
                 <span className="font-medium text-white">Deep research</span> sends TinyFish&apos;s research agent to work
-                for 5 to 20 minutes across far more sources. It is counted separately from credits because every run has
-                a real cost behind it, so each plan includes a set number per month.
+                for 5 to 20 minutes across far more sources. Each run costs {DEEP_RUN_CREDITS} credits, and longer scripts
+                use more runs. It is available from the Creator plan.
               </p>
               <ul className="mt-7 space-y-3 text-soft">
                 <li className="card p-5">
-                  <span className="font-medium text-white">Need more credits?</span> {TOP_UP.credits} credits for $
-                  {TOP_UP.price}. They never expire.
-                </li>
-                <li className="card p-5">
-                  <span className="font-medium text-white">Need more deep runs?</span> {DEEP_PACK.runs} runs for $
-                  {DEEP_PACK.price}. They never expire.
+                  <span className="font-medium text-white">Need more credits?</span>{" "}
+                  {TOP_UP.credits.toLocaleString("en-US")} credits for ${TOP_UP.price}. They never expire.
                 </li>
               </ul>
             </div>
             <div className="relative min-w-0 overflow-x-auto">
-              <div className="card min-w-[26rem] overflow-hidden">
+              <div className="card min-w-[34rem] overflow-hidden">
                 <table className="w-full text-left font-mono text-sm">
-                  <caption className="sr-only">Credits and deep research runs by script length</caption>
+                  <caption className="sr-only">Credits by script length, with and without deep research</caption>
                   <thead className="bg-elevated text-[11px] uppercase tracking-[0.14em] text-white">
                     <tr className="border-b border-line">
                       <th scope="col" className="px-5 py-4 font-normal">
@@ -104,7 +99,7 @@ export default function PricingPage() {
                         Credits
                       </th>
                       <th scope="col" className="px-5 py-4 text-right font-normal">
-                        Deep runs
+                        With deep research
                       </th>
                     </tr>
                   </thead>
@@ -113,17 +108,23 @@ export default function PricingPage() {
                       <tr key={r.words} className="border-b border-line last:border-0">
                         <th scope="row" className="px-5 py-4 font-medium text-white">
                           {r.words.toLocaleString("en-US")} words
+                          <span className="block text-[11px] font-normal text-mute">{r.type}</span>
                         </th>
                         <td className="px-3 py-4 text-soft">{r.time}</td>
-                        <td className="px-3 py-4 text-right text-good">{r.credits}</td>
-                        <td className="px-5 py-4 text-right text-gold">{r.deepRuns}</td>
+                        <td className="px-3 py-4 text-right text-good">{r.credits.toLocaleString("en-US")}</td>
+                        <td className="px-5 py-4 text-right text-gold">
+                          {withDeep(r).toLocaleString("en-US")}
+                          <span className="block text-[11px] text-mute">
+                            {r.deepRuns} {r.deepRuns === 1 ? "run" : "runs"}
+                          </span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
               <p className="mt-3 font-mono text-[11px] text-mute">
-                Deep runs only apply when you pick deep research. Standard research uses none.
+                The right column is the script plus its deep research runs at {DEEP_RUN_CREDITS} credits each.
               </p>
             </div>
           </div>
@@ -138,7 +139,7 @@ export default function PricingPage() {
               <p className="mt-3 text-sm text-soft">Transparent software capabilities designed to scale with your volume.</p>
             </div>
             <div className="relative mt-12 overflow-x-auto">
-              <div className="card min-w-[44rem] overflow-hidden">
+              <div className="card min-w-[52rem] overflow-hidden">
                 <table className="w-full text-left font-mono text-sm">
                   <caption className="sr-only">Plan comparison</caption>
                   <thead className="bg-elevated text-[11px] uppercase tracking-[0.14em]">

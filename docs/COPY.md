@@ -37,7 +37,7 @@ A competitor's page was pasted in. It is a good teardown of how this market sell
 - 2 outputs per run (visual cues, clean with sources)
 - Deep research runs typically take 5 to 20 minutes (TinyFish docs)
 - Every claim is mapped to a source in the fact-check list (this is the design rule; keep the wording as a design statement until the checker is built and tested)
-- "Your first script is free" (plan: 2 free credits)
+- "Your first script is free" (plan: 300 free credits, about 2 standard scripts)
 
 **We must not say until we have evidence:**
 - Any retention figure, view count, "proven to go viral", "scripts that go viral"

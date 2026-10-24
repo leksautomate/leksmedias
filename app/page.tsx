@@ -195,8 +195,8 @@ const HOME_FAQ = [
     a: "Yes. It has no brackets, timestamps, speaker labels or links, so a text-to-speech voice reads only what you want spoken. Sources live in a separate block.",
   },
   {
-    q: "What is a credit?",
-    a: "One credit is a finished script of up to 2,500 words, about 17 minutes of narration, with research and both versions included. A 10,000-word script uses 4 credits and a 25,000-word script uses 10.",
+    q: "How do credits work?",
+    a: "Every script costs credits by length: 100 for a short video, 150 for a standard 2,500-word video, 300 for 5,000 words and 600 for 10,000. A 25,000-word script costs 1,500. Research and both versions are included, and deep research costs 800 credits a run.",
   },
   {
     q: "Can I use my own AI agent instead?",
@@ -504,7 +504,7 @@ export default function Home() {
                 Simple plans. <em>Paid per script.</em>
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-lg text-soft">
-                One credit is 2,500 words of script. Cited research and both versions are always included.
+                A standard 2,500-word script costs 150 credits. Cited research and both versions are always included.
               </p>
             </div>
             <div className="mt-14">

@@ -81,21 +81,44 @@ Prompt caching matters: the 25k-token composed skill prefix is read from cache a
 
 ## 3. Pricing built on these costs
 
-- **1 credit = up to 2,500 words** (one section, about 17 min). Cost to us about $0.25 to $0.55 with standard research; the plan math uses a conservative **$0.40**.
-- **Deep research is a separate quota** of TinyFish runs, because each costs $2 to $3 no matter how short the script is. The plan math uses **$2.30** blended.
-- Yearly billing = **pay 10 months, get 12**. It is the simplest offer to explain and protects margin better than a flat 20% off.
+Everything is priced in one currency, **credits**. Script costs by length and the deep research price are fixed in credits, and each credit costs us about the same, so margins are easy to reason about.
 
-| Plan | Price | Credits | Deep runs | Cost to serve at 100% use | Gross margin, monthly | Gross margin, yearly | Gross margin at 50% use |
+| Script | Credits | With deep research |
+| --- | --- | --- |
+| 1,200 words | 100 | 900 (1 run) |
+| 2,500 words | 150 | 950 (1 run) |
+| 5,000 words | 300 | 1,100 (1 run) |
+| 8,000 words | 500 | 2,100 (2 runs) |
+| 10,000 words | 600 | 2,200 (2 runs) |
+| 25,000 words | 1,500 | 4,700 (4 runs) |
+| 30,000 words | 1,800 | 5,800 (5 runs) |
+
+A deep run is **800 credits**. Our cost per credit: a standard 2,500-word script is 150 credits and costs about $0.25 to $0.42 (the plan math uses the conservative end, $0.0028 per credit); a deep run is 800 credits and costs $2 to $3 ($0.0029 per credit at $2.30). Long scripts are actually cheaper per credit to serve (a 30,000-word script costs $1.62 for 1,800 credits, $0.0009 each), so the uniform assumption is conservative.
+
+Yearly billing = **pay 10 months, get 12**. Deep research is available from the Creator plan.
+
+| Plan | Price | Credits | $ per 1,000 | Cost at 100% use | GM monthly | GM yearly | GM at 50% use |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Creator | $29 | 15 | 2 | $10.60 | 60% | 52% | 78% |
-| Pro | $79 | 50 | 8 | $38.40 | 48% | 38% | 72% |
-| Studio | $199 | 150 | 20 | $106.00 | 44% | 33% | 70% |
+| Starter | $9.99 | 1,000 | $9.99 | $2.80 | 66% | 60% | 80% |
+| Creator | $24.99 | 3,500 | $7.14 | $9.80 | 57% | 49% | 76% |
+| Pro | $49.99 | 9,000 | $5.55 | $25.20 | 46% | 36% | 71% |
+| Studio | $149.99 | 30,000 | $5.00 | $84.00 | 41% | 30% | 69% |
 
-Margins are after card fees (2.9% + $0.30) and before support and hosting. Real usage is rarely 100%, so the 50% column is closer to what to expect. Studio on yearly billing is the thinnest cell: watch it.
+Margins are after card fees (2.9% + $0.30, which is 5.9% of a $9.99 payment) and before support and hosting. Real usage is rarely 100%, so the 50% column is closer to what to expect. Studio on yearly billing is the thinnest cell.
 
-Effective price per 1,000 words of finished, researched script: **$0.53 to $0.77 monthly**, $0.44 to $0.64 yearly. For comparison a human researcher-writer commonly charges many times that.
+**Why Pro is 9,000 credits and not 15,000:** at 15,000 credits the cost at full use is $42 and the margin on $49.99 falls to 12% (54% at half use). Bigger numbers are free to show, but the ratio of credits to price is what has to hold.
 
-Add-ons: **10 credits for $25** ($2.50 each, cost about $0.40), **5 deep runs for $20** ($4 each, cost $2 to $3).
+Real-mix checks with the cost model (Sonnet 5.5):
+
+| Scenario | Credits used | Real cost | Gross margin |
+| --- | --- | --- | --- |
+| Pro, 4 documentaries of 10,000 words with deep research | 8,800 | $22.16 | 52% |
+| Pro, 60 standard scripts | 9,000 | $15 to $25 | 46% to 66% |
+| Studio, 5 marathons of 30,000 words with deep research | 29,000 | $61.90 | 56% |
+
+Effective price of finished, researched script: Starter $0.60 per 1,000 words (at 150 credits per 2,500 words), Pro $0.33, Studio $0.30.
+
+Top-up: **2,000 credits for $25** ($12.50 per 1,000, higher than any plan, cost about $5.60, 74% margin), so nobody buys top-ups instead of upgrading.
 
 ## 4. Capacity limits that will bite before money does
 
@@ -118,4 +141,4 @@ These must be replaced with measurements in the Phase 0 spike:
 4. Agentic research loops usually take several planner turns; the model counts one. Add a safety factor of 1.5 on standard research until measured.
 5. Cost of retries and failed runs (not charged by TinyFish, but Claude tokens already spent are).
 
-**Decision rule:** if measured blended cost per credit exceeds **$0.75**, or per deep run exceeds **$3.00**, cut quotas before raising prices.
+**Decision rule:** if measured cost per credit exceeds **$0.0040** (about $0.60 per standard script), or a deep run exceeds **$3.00**, cut credit allowances before raising prices.

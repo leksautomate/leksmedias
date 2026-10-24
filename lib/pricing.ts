@@ -1,5 +1,6 @@
-// Plan numbers are sized from real provider prices. See docs/COSTS.md and docs/cost-model.py.
-export type PlanId = "free" | "creator" | "pro" | "studio";
+// One balance: credits. A script costs credits by word count, deep research costs credits per run.
+// Sized from real provider prices. See docs/COSTS.md and docs/cost-model.py.
+export type PlanId = "free" | "starter" | "creator" | "pro" | "studio";
 
 export type Feature = { text: string; soon?: boolean };
 
@@ -9,25 +10,33 @@ export type Plan = {
   blurb: string;
   /** Price in USD when billed monthly. */
   monthly: number;
-  /** Credits granted per period. One credit = up to WORDS_PER_CREDIT words of script. */
+  /** Credits granted per period (once for the free trial). */
   credits: number;
-  /** Deep research runs per period. Each run is one TinyFish Research run. */
-  deepRuns: number;
   /** Longest single script, in words. */
   maxWords: number;
-  /** Free plan credits are granted once, paid plans renew monthly. */
+  /** Deep research available on this plan. */
+  deepResearch: boolean;
   oneTime?: boolean;
   featured?: boolean;
   cta: string;
   features: Feature[];
 };
 
-export const WORDS_PER_CREDIT = 2500;
-/** Yearly billing = pay for 10 months, get 12. */
+/** Credits for a standard 2,500-word script. Used to show "about N scripts". */
+export const STANDARD_SCRIPT_CREDITS = 150;
+/** One TinyFish Research run costs us $2 to $3, so it is priced in credits too. */
+export const DEEP_RUN_CREDITS = 800;
+/** Yearly billing = pay 10 months, get 12. */
 export const YEARLY_MONTHS_CHARGED = 10;
 
-export const yearlyTotal = (p: Plan) => p.monthly * YEARLY_MONTHS_CHARGED;
-export const yearlyPerMonth = (p: Plan) => Math.round(yearlyTotal(p) / 12);
+const round2 = (n: number) => Math.round(n * 100) / 100;
+export const yearlyTotal = (p: Plan) => round2(p.monthly * YEARLY_MONTHS_CHARGED);
+export const yearlyPerMonth = (p: Plan) => round2(yearlyTotal(p) / 12);
+export const standardScripts = (p: Plan) => Math.floor(p.credits / STANDARD_SCRIPT_CREDITS);
+
+/** Price of 1,000 credits on a plan, so tiers are easy to compare. */
+export const per1kCredits = (p: Plan, yearly: boolean) =>
+  p.credits === 0 ? 0 : ((yearly ? yearlyTotal(p) / 12 : p.monthly) / p.credits) * 1000;
 
 export const PLANS: Plan[] = [
   {
@@ -35,34 +44,50 @@ export const PLANS: Plan[] = [
     name: "Free trial",
     blurb: "See a full researched script before you pay.",
     monthly: 0,
-    credits: 2,
-    deepRuns: 0,
+    credits: 300,
     maxWords: 2500,
+    deepResearch: false,
     oneTime: true,
     cta: "Try it free",
     features: [
-      { text: "2 credits, one time" },
+      { text: "300 credits, one time" },
       { text: "Standard research with cited sources" },
       { text: "Both script versions" },
       { text: "Scripts up to 2,500 words" },
-      { text: "Copy to clipboard" },
+    ],
+  },
+  {
+    id: "starter",
+    name: "Starter",
+    blurb: "For a creator getting started.",
+    monthly: 9.99,
+    credits: 1000,
+    maxWords: 2500,
+    deepResearch: false,
+    cta: "Get early access",
+    features: [
+      { text: "1,000 credits a month, about 6 standard scripts" },
+      { text: "Standard research with cited sources" },
+      { text: "Both versions, with sources" },
+      { text: "All 6 script formats" },
+      { text: "Automatic AI-pattern audit" },
+      { text: "Scripts up to 2,500 words" },
+      { text: "Copy and TXT export" },
     ],
   },
   {
     id: "creator",
     name: "Creator",
     blurb: "For one channel posting every week.",
-    monthly: 29,
-    credits: 15,
-    deepRuns: 2,
+    monthly: 24.99,
+    credits: 3500,
     maxWords: 5000,
+    deepResearch: true,
     cta: "Get early access",
     features: [
-      { text: "15 credits a month, about 37,000 words" },
-      { text: "2 deep research runs a month" },
-      { text: "All 6 script formats" },
-      { text: "Both versions, with sources" },
-      { text: "Automatic AI-pattern audit" },
+      { text: "3,500 credits a month, about 23 standard scripts" },
+      { text: "Everything in Starter" },
+      { text: "Deep research, 800 credits a run" },
       { text: "Scripts up to 5,000 words" },
       { text: "1 channel voice profile" },
       { text: "Export to TXT and Markdown" },
@@ -73,15 +98,14 @@ export const PLANS: Plan[] = [
     id: "pro",
     name: "Pro",
     blurb: "For channels that publish several times a week.",
-    monthly: 79,
-    credits: 50,
-    deepRuns: 8,
+    monthly: 49.99,
+    credits: 9000,
     maxWords: 12500,
+    deepResearch: true,
     featured: true,
     cta: "Get early access",
     features: [
-      { text: "50 credits a month, about 125,000 words" },
-      { text: "8 deep research runs a month" },
+      { text: "9,000 credits a month, about 60 standard scripts" },
       { text: "Everything in Creator" },
       { text: "Scripts up to 12,500 words, written section by section" },
       { text: "Add your own sources and links" },
@@ -95,14 +119,13 @@ export const PLANS: Plan[] = [
     id: "studio",
     name: "Studio",
     blurb: "For agencies and multi-channel operators.",
-    monthly: 199,
-    credits: 150,
-    deepRuns: 20,
+    monthly: 149.99,
+    credits: 30000,
     maxWords: 30000,
+    deepResearch: true,
     cta: "Get early access",
     features: [
-      { text: "150 credits a month, about 375,000 words" },
-      { text: "20 deep research runs a month" },
+      { text: "30,000 credits a month, about 200 standard scripts" },
       { text: "Everything in Pro" },
       { text: "Scripts up to 30,000 words, for 2 hour plus documentaries" },
       { text: "Unlimited channel voice profiles" },
@@ -114,20 +137,24 @@ export const PLANS: Plan[] = [
   },
 ];
 
-/** Credits and deep runs for common script sizes. Narration time assumes 150 words a minute. */
+/**
+ * Credits per script by length. Narration time assumes 150 words a minute.
+ * `deepRuns` is how many TinyFish runs a deep-research script uses (lean policy).
+ * With deep research a script costs `credits + deepRuns * DEEP_RUN_CREDITS`.
+ */
 export const CREDIT_RULES = [
-  { words: 2500, time: "about 17 min", credits: 1, deepRuns: 1 },
-  { words: 5000, time: "about 33 min", credits: 2, deepRuns: 1 },
-  { words: 10000, time: "about 1 hr 7 min", credits: 4, deepRuns: 2 },
-  { words: 25000, time: "about 2 hr 47 min", credits: 10, deepRuns: 4 },
-  { words: 30000, time: "about 3 hr 20 min", credits: 12, deepRuns: 5 },
+  { type: "Short video", words: 1200, time: "about 8 min", credits: 100, deepRuns: 1 },
+  { type: "Standard video", words: 2500, time: "about 17 min", credits: 150, deepRuns: 1 },
+  { type: "Long video", words: 5000, time: "about 33 min", credits: 300, deepRuns: 1 },
+  { type: "Feature", words: 8000, time: "about 53 min", credits: 500, deepRuns: 2 },
+  { type: "Documentary", words: 10000, time: "about 1 hr 7 min", credits: 600, deepRuns: 2 },
+  { type: "Epic", words: 25000, time: "about 2 hr 47 min", credits: 1500, deepRuns: 4 },
+  { type: "Marathon", words: 30000, time: "about 3 hr 20 min", credits: 1800, deepRuns: 5 },
 ] as const;
 
-export const TOP_UP = { credits: 10, price: 25 } as const;
-export const DEEP_PACK = { runs: 5, price: 20 } as const;
+export const withDeep = (r: (typeof CREDIT_RULES)[number]) => r.credits + r.deepRuns * DEEP_RUN_CREDITS;
 
-export const perCredit = (plan: Plan, yearly: boolean) =>
-  plan.credits === 0 ? 0 : (yearly ? yearlyTotal(plan) / 12 : plan.monthly) / plan.credits;
+export const TOP_UP = { credits: 2000, price: 25 } as const;
 
 export type CompareRow = {
   label: string;
@@ -135,38 +162,39 @@ export type CompareRow = {
 };
 
 export const COMPARISON: CompareRow[] = [
-  { label: "Credits (2,500 words each)", values: { free: "2 once", creator: "15 / mo", pro: "50 / mo", studio: "150 / mo" } },
-  { label: "Deep research runs", values: { free: false, creator: "2 / mo", pro: "8 / mo", studio: "20 / mo" } },
-  { label: "Standard research with sources", values: { free: true, creator: true, pro: true, studio: true } },
-  { label: "Script with visual cues", values: { free: true, creator: true, pro: true, studio: true } },
-  { label: "Clean script with sources", values: { free: true, creator: true, pro: true, studio: true } },
-  { label: "AI-pattern audit", values: { free: true, creator: true, pro: true, studio: true } },
-  { label: "Longest script", values: { free: "2,500 words", creator: "5,000 words", pro: "12,500 words", studio: "30,000 words" } },
-  { label: "Your own sources", values: { free: false, creator: false, pro: true, studio: true } },
-  { label: "Channel voice profiles", values: { free: "0", creator: "1", pro: "5", studio: "Unlimited" } },
-  { label: "Export", values: { free: "Copy", creator: "TXT, MD", pro: "TXT, MD, DOCX", studio: "TXT, MD, DOCX" } },
-  { label: "Connect your own AI agent (MCP)", values: { free: false, creator: "Soon", pro: "Soon", studio: "Soon" } },
-  { label: "Batch queue", values: { free: false, creator: false, pro: false, studio: "10 at once" } },
-  { label: "Team seats", values: { free: "1", creator: "1", pro: "1", studio: "3" } },
-  { label: "Priority research queue", values: { free: false, creator: false, pro: true, studio: true } },
+  { label: "Credits", values: { free: "300 once", starter: "1,000 / mo", creator: "3,500 / mo", pro: "9,000 / mo", studio: "30,000 / mo" } },
+  { label: "Standard scripts (150 credits)", values: { free: "2", starter: "6", creator: "23", pro: "60", studio: "200" } },
+  { label: "Standard research with sources", values: { free: true, starter: true, creator: true, pro: true, studio: true } },
+  { label: "Deep research (800 credits a run)", values: { free: false, starter: false, creator: true, pro: true, studio: true } },
+  { label: "Script with visual cues", values: { free: true, starter: true, creator: true, pro: true, studio: true } },
+  { label: "Clean script with sources", values: { free: true, starter: true, creator: true, pro: true, studio: true } },
+  { label: "AI-pattern audit", values: { free: true, starter: true, creator: true, pro: true, studio: true } },
+  { label: "Longest script", values: { free: "2,500 words", starter: "2,500 words", creator: "5,000 words", pro: "12,500 words", studio: "30,000 words" } },
+  { label: "Your own sources", values: { free: false, starter: false, creator: false, pro: true, studio: true } },
+  { label: "Channel voice profiles", values: { free: "0", starter: "0", creator: "1", pro: "5", studio: "Unlimited" } },
+  { label: "Export", values: { free: "Copy", starter: "Copy, TXT", creator: "TXT, MD", pro: "TXT, MD, DOCX", studio: "TXT, MD, DOCX" } },
+  { label: "Connect your own AI agent (MCP)", values: { free: false, starter: false, creator: "Soon", pro: "Soon", studio: "Soon" } },
+  { label: "Batch queue", values: { free: false, starter: false, creator: false, pro: false, studio: "10 at once" } },
+  { label: "Team seats", values: { free: "1", starter: "1", creator: "1", pro: "1", studio: "3" } },
+  { label: "Priority research queue", values: { free: false, starter: false, creator: false, pro: true, studio: true } },
 ];
 
 export const PRICING_FAQ = [
   {
-    q: "What is a credit?",
-    a: "One credit pays for a finished script of up to 2,500 words, about 17 minutes of narration. Research and both versions are included. A 10,000-word script uses 4 credits and a 25,000-word script uses 10.",
+    q: "How do credits work?",
+    a: "Every script costs credits based on its length: 100 for a short video, 150 for a standard 2,500-word video, 300 for 5,000 words, 500 for 8,000 words and 600 for 10,000. Research and both versions are included. A 25,000-word script costs 1,500 credits.",
   },
   {
     q: "What is the difference between standard and deep research?",
-    a: "Standard research reads and cites a focused set of live pages and is included in every credit. Deep research sends TinyFish's research agent to work for 5 to 20 minutes across far more sources. It is limited by the deep runs in your plan because each run costs real money to produce. Long scripts use more runs: 2 for 10,000 words, 4 for 25,000.",
+    a: "Standard research reads and cites a focused set of live pages and is included in the script price. Deep research sends TinyFish's research agent to work for 5 to 20 minutes across far more sources. Each deep run costs 800 credits, and longer scripts use more runs: 2 for 10,000 words, 4 for 25,000. Deep research is available from the Creator plan.",
   },
   {
     q: "What happens if a run fails?",
-    a: "You are only charged for scripts that finish. If research or writing fails part way, the credits and deep runs for that job go back to your balance.",
+    a: "You are only charged for scripts that finish. If research or writing fails part way, the credits for that job go back to your balance.",
   },
   {
     q: "Do unused credits roll over?",
-    a: "Monthly credits and deep runs reset each billing period. Credits from a top-up pack never expire.",
+    a: "Monthly credits reset each billing period. Credits from a top-up pack never expire.",
   },
   {
     q: "Can I switch plans or cancel?",
@@ -174,6 +202,6 @@ export const PRICING_FAQ = [
   },
   {
     q: "Can I use my own AI agent?",
-    a: "That is planned for every paid plan. You will connect leksmedias to Claude Code, Codex, Antigravity, Hermes or any MCP-capable agent and let it call our research and checks, writing with your own subscription.",
+    a: "That is planned for the paid plans from Creator up. You will connect Leksmedia to Claude Code, Codex, Antigravity, Hermes or any MCP-capable agent and let it call our research and checks, writing with your own subscription.",
   },
 ];

@@ -21,8 +21,8 @@ Roles are stored on the user row. Every action checks a permission, not a role n
 Today and last 30 days: new signups, activated users (finished a first script), paying users, MRR, scripts finished, **cost of goods vs revenue and gross margin**, failure rate. Red banners when something needs action (capacity near limit, margin below target, queue stuck).
 
 ### Users
-Search by email or id. Profile shows plan, credits and deep-run balances, Stripe status, runs, and a timeline of events. Actions:
-- Grant or deduct credits / deep runs **with a required reason**. Every change is a ledger row, never an edit to a balance.
+Search by email or id. Profile shows plan, credit balance, Stripe status, runs, and a timeline of events. Actions:
+- Grant or deduct credits **with a required reason**. Every change is a ledger row, never an edit to a balance.
 - Change plan, pause, suspend, delete (with a 7-day soft delete).
 - Resend verification email, force sign-out.
 - **View as user** (read-only impersonation): opens their dashboard with a banner, every view is written to the audit log, and it never shows payment details.
@@ -36,7 +36,7 @@ Script text is hidden from Support and Finance by default; Admin can open it wit
 The screen that keeps the business honest.
 - Cost per run broken into Claude (by model and step) and TinyFish (by run, `deep` vs `max`).
 - Margin by plan, by user, by script length. Top 20 users by cost vs what they pay.
-- **Cost per credit and per deep run vs target** ($0.75 and $3.00 from [`COSTS.md`](COSTS.md)), trend line, alert when above.
+- **Cost per credit and per deep run vs target** ($0.0040 and $3.00 from [`COSTS.md`](COSTS.md)), trend line, alert when above.
 - Prices live in a table (`provider_prices`) so a provider change is one edit and history is preserved.
 
 ### Capacity and health
@@ -49,7 +49,7 @@ The screen that keeps the business honest.
 Stripe subscriptions, failed payments, refunds, coupons and promo codes, credit pack sales. Refund button issues the Stripe refund **and** a credit ledger reversal in one transaction. Revenue export for accounting.
 
 ### Pricing and plans
-Edit plans, credits, deep runs, word limits, top-up packs. Changes are **drafted, previewed on the public pricing page, then published**. Existing subscribers stay on their plan version until you migrate them. The public pricing and landing pages read from this table instead of `lib/pricing.ts` once it exists.
+Edit plans, credit allowances, script credit costs, the deep-run credit price, word limits, top-up packs. Changes are **drafted, previewed on the public pricing page, then published**. Existing subscribers stay on their plan version until you migrate them. The public pricing and landing pages read from this table instead of `lib/pricing.ts` once it exists.
 
 ### Prompts and models
 - Prompt modules (master rules, hook patterns, structures, audit rules) stored as versioned records, not files in the repo. Draft, test against saved briefs, publish, roll back.
@@ -94,7 +94,7 @@ Every paid external call writes a cost row **at call time**. Margin reports are 
 | --- | --- |
 | TinyFish wallet low | below $20 or below 3 days of average spend |
 | Capacity | queue wait over 20 min, or Fetch over 80% of the daily cap |
-| Margin | blended cost per credit over $0.75 or per deep run over $3.00 over a day |
+| Margin | cost per credit over $0.0040 or per deep run over $3.00 over a day |
 | Spend spike | Claude or TinyFish spend over 2x the 7-day average |
 | Failure rate | over 5% of runs failing in an hour |
 | Abuse | more than 3 free-trial signups from one device in a day |

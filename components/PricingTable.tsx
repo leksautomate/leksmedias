@@ -2,10 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { PLANS, perCredit, yearlyPerMonth, yearlyTotal } from "@/lib/pricing";
+import { PLANS, per1kCredits, yearlyPerMonth, yearlyTotal } from "@/lib/pricing";
 
-const usd = (n: number, digits = 0) =>
-  `$${n.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+const usd = (n: number) =>
+  `$${n.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`;
+
+const FREE = PLANS.find((p) => p.id === "free")!;
+const PAID = PLANS.filter((p) => p.id !== "free");
 
 export function PricingTable() {
   const [yearly, setYearly] = useState(true);
@@ -43,16 +49,15 @@ export function PricingTable() {
       </div>
 
       <ul className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {PLANS.map((p) => {
+        {PAID.map((p) => {
           const price = yearly ? yearlyPerMonth(p) : p.monthly;
-          const cpc = perCredit(p, yearly);
           return (
             <li
               key={p.id}
               className={`card relative flex flex-col p-7 ${
                 p.featured ? "border-gold shadow-[0_0_60px_-24px_var(--color-gold-glow)]" : ""
               }`}
-              style={p.featured ? { borderColor: "var(--color-gold)", borderWidth: 2 } : undefined}
+              style={p.featured ? { borderWidth: 2 } : undefined}
             >
               {p.featured && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gold px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-bg">
@@ -66,34 +71,21 @@ export function PricingTable() {
                 <span className={`font-serif text-5xl italic ${p.featured ? "text-gold" : "text-white"}`}>
                   {usd(price)}
                 </span>
-                {p.monthly > 0 && <span className="font-mono text-xs text-mute">/ month</span>}
+                <span className="font-mono text-xs text-mute">/ month</span>
               </p>
               <p className="mt-1 min-h-5 font-mono text-[11px] text-mute">
-                {p.monthly === 0
-                  ? "No card required"
-                  : yearly
-                    ? `Billed ${usd(yearlyTotal(p))} per year`
-                    : "Billed monthly, cancel any time"}
+                {yearly ? `Billed ${usd(yearlyTotal(p))} per year` : "Billed monthly, cancel any time"}
               </p>
 
               <div className="mt-5 space-y-1 rounded-lg border border-line bg-elevated px-3 py-2.5 font-mono text-xs">
                 <p>
-                  <span className="font-semibold text-white">{p.credits} credits</span>
-                  <span className="text-soft">{p.oneTime ? " one time" : " / month"}</span>
-                  {cpc > 0 && <span className="text-mute"> · {usd(cpc, 2)} each</span>}
+                  <span className="font-semibold text-white">{p.credits.toLocaleString("en-US")} credits</span>
+                  <span className="text-soft"> / month</span>
                 </p>
-                <p className="text-soft">
-                  <span className="font-semibold text-white">
-                    {p.deepRuns > 0 ? `${p.deepRuns} deep runs` : "Standard research"}
-                  </span>
-                  {p.deepRuns > 0 && !p.oneTime ? " / month" : ""}
-                </p>
+                <p className="text-mute">{usd(per1kCredits(p, yearly))} per 1,000 credits</p>
               </div>
 
-              <Link
-                href="/#early-access"
-                className={`btn mt-5 w-full ${p.featured ? "btn-primary" : "btn-ghost"}`}
-              >
+              <Link href="/#early-access" className={`btn mt-5 w-full ${p.featured ? "btn-primary" : "btn-ghost"}`}>
                 {p.cta} <span aria-hidden="true">→</span>
               </Link>
 
@@ -119,6 +111,19 @@ export function PricingTable() {
           );
         })}
       </ul>
+
+      <div className="card mt-5 flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
+        <div>
+          <p className="font-serif text-2xl text-white">Try it free first</p>
+          <p className="mt-1 text-sm text-soft">
+            {FREE.credits} credits, one time. That is about {Math.floor(FREE.credits / 150)} standard scripts with
+            standard research and cited sources. No card required.
+          </p>
+        </div>
+        <Link href="/#early-access" className="btn btn-ghost shrink-0">
+          {FREE.cta} <span aria-hidden="true">→</span>
+        </Link>
+      </div>
     </div>
   );
 }

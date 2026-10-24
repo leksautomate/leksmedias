@@ -55,7 +55,7 @@ Names are stable and verb-first. All return structured JSON plus a short text su
 
 | Tool | Input | Output | Cost |
 | --- | --- | --- | --- |
-| `start_research` | `topic`, `format`, `words`, `depth` (`standard`/`deep`), `sources[]?`, `idempotency_key` | `run_id`, `estimated_cost`, `eta` | credits: ½ per 2,500 words (standard); deep uses 1 deep run per TinyFish run |
+| `start_research` | `topic`, `format`, `words`, `depth` (`standard`/`deep`), `sources[]?`, `idempotency_key` | `run_id`, `estimated_cost`, `eta` | credits: 75 per 2,500 words (standard); deep is 800 credits per TinyFish run |
 | `get_research` | `run_id`, `cursor?` | `status`, `stage`, progress events, and when done the **fact ledger** (`id`, `claim`, `source_id`, `confidence`) and `sources[]` | free |
 | `add_sources` | `run_id`, `urls[]` | updated ledger | uses Fetch, free within limits |
 | `get_writing_rules` | `format`, `niche?`, `mode` (`visual`/`clean`), `section?` | rules text: hook pattern, structure, transitions, style, banned patterns | free |
@@ -135,12 +135,12 @@ TinyFish's server exposes `search`, `fetch_content` and `start_deep_research` / 
 
 | Action | Charge |
 | --- | --- |
-| Standard research + ledger | **½ credit per 2,500 words** of planned script (our cost is roughly a tenth of a full-service credit, so margin stays high) |
-| Deep research | **1 deep run per TinyFish run**, same as the website |
+| Standard research + ledger | **half the website price**: 75 credits per 2,500 words of planned script (our cost is a fraction of a full-service script, so margin stays high) |
+| Deep research | **800 credits per TinyFish run**, same as the website |
 | Rules, validation, sources block, save | free (fair use) |
 | `write_script` (we write) | same as the website |
 
-Credits and deep runs are one shared balance with the website. Every tool call that spends writes a ledger row tagged with the key id, so the user sees "Claude Code key: 3.5 credits this month" and the admin sees it in cost reports. Half credits mean the ledger stores credits in tenths.
+Credits are one shared balance with the website. Every tool call that spends writes a ledger row tagged with the key id, so the user sees "Claude Code key: 1,250 credits this month" and the admin sees it in cost reports.
 
 ## 8. Security and abuse
 
@@ -166,6 +166,6 @@ Test matrix: the four clients above × (key auth, large output, long-running pol
 ## 10. Open questions
 
 1. Should agent mode be on every paid plan or Pro and up? (Plan page currently says all paid plans, marked Soon.)
-2. Is ½ credit per 2,500 words the right agent-mode rate, or should research be a flat 1 credit?
+2. Is 75 credits per 2,500 words (half the website price) the right agent-mode rate, or should research be a flat fee?
 3. Do we want to publish the MCP server for third-party directories once it is stable?
 4. Domain name for the production host, needed to print real setup commands.

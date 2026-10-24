@@ -106,7 +106,33 @@ def table(words_list):
     return "\n".join(out)
 
 
+# ---- Plan ladder (credits). Run with: python3 docs/cost-model.py --plans ----
+STANDARD_SCRIPT_CREDITS = 150      # 2,500 words
+DEEP_RUN_CREDITS = 800             # one TinyFish Research run
+COST_PER_CREDIT = 0.0028           # conservative: ~$0.42 per standard script, ~$2.24 per deep run
+LADDER = [("Starter", 9.99, 1000), ("Creator", 24.99, 3500), ("Pro", 49.99, 9000), ("Studio", 149.99, 30000)]
+
+
+def card_fee(price):
+    return price * 0.029 + 0.30
+
+
+def plan_table():
+    rows = ["| Plan | Price | Credits | $ per 1,000 | Cost at 100% use | GM monthly | GM yearly (10 of 12) | GM at 50% use |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+    for name, price, credits in LADDER:
+        cost = credits * COST_PER_CREDIT
+        gm = lambda p, use=1.0: (p - card_fee(p) - cost * use) / p * 100
+        yearly = price * 10 / 12
+        rows.append(f"| {name} | ${price:.2f} | {credits:,} | ${price / credits * 1000:.2f} | ${cost:.2f} "
+                    f"| {gm(price):.0f}% | {gm(yearly):.0f}% | {gm(price, 0.5):.0f}% |")
+    return "\n".join(rows)
+
+
 if __name__ == "__main__":
+    if "--plans" in sys.argv:
+        print(plan_table())
+        sys.exit(0)
     sizes = [1800, 10_000, 25_000] + [int(a) for a in sys.argv[1:]]
     print(table(sizes))
     print("\n### Breakdown, 10,000 words, Sonnet 5.5 writer, standard research\n")

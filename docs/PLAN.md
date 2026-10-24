@@ -44,7 +44,7 @@ Full UX detail: [`UX.md`](UX.md).
 - **Auth**: Clerk or Supabase Auth (decide at Phase 1). Email verification gates free credits.
 - **DB**: Postgres (Neon or Supabase) with Drizzle. Core tables: `users`, `projects`, `runs`, `facts`, `sources`, `scripts`, `credit_ledger`, `subscriptions`, `api_keys`. Admin tables in [`ADMIN.md`](ADMIN.md).
 - **Jobs**: Inngest or Trigger.dev. Research takes 5 to 20 minutes, so it cannot live in a request. Jobs emit progress events the UI follows over SSE.
-- **Billing**: Stripe subscriptions plus an **append-only credit ledger** (grant, reserve, spend, refund) in tenths of a credit, with a second counter for deep runs. Reserve at run start, settle on success, refund on failure.
+- **Billing**: Stripe subscriptions plus an **append-only credit ledger** (grant, reserve, spend, refund) in whole credits, with deep research priced in the same credits. Reserve at run start, settle on success, refund on failure.
 - **LLM**: Anthropic API. The static skill prefix goes first so it caches (cache reads cost 5% of input on Sonnet 5.5). Haiku 5.5 for reading pages, extraction, mapping and lint; Sonnet 5.5 for outline, synthesis and default writing; Opus 5.5 as an optional "premium voice". See [`COSTS.md`](COSTS.md).
 - **MCP**: remote Streamable HTTP server in the same app at `/mcp`. See [`MCP.md`](MCP.md).
 
@@ -98,19 +98,24 @@ Rules that become code, not just prompt text:
 
 Full reasoning and margin tables in [`COSTS.md`](COSTS.md). The landing and pricing pages already show this.
 
-- **1 credit = a finished script of up to 2,500 words** (about 17 min). 10,000 words = 4 credits, 25,000 words = 10.
-- **Deep research is a separate quota** because each TinyFish run is a fixed $2 to $3.
+- **One balance: credits.** A script costs credits by length: **100** (1,200 words), **150** (2,500), **300** (5,000), **500** (8,000), **600** (10,000), **1,500** (25,000), **1,800** (30,000). Standard research and both versions are included.
+- **Deep research costs 800 credits per TinyFish run** (a run costs us $2 to $3). Longer scripts use more runs: 1 up to 5,000 words, 2 for 10,000, 4 for 25,000, 5 for 30,000. So a 10,000-word deep script is 600 + 1,600 = 2,200 credits.
+- Deep research is available from the Creator plan; Starter and the free trial use standard research.
+- Credits are sized so every credit costs us about the same (about $0.0028 conservatively), whatever it is spent on. That keeps margins predictable and lets us show big, friendly numbers.
 - Yearly = **pay 10 months, get 12**.
 
-| Plan | Monthly | Yearly (per month) | Credits | Deep runs | Longest script |
-| --- | --- | --- | --- | --- | --- |
-| Free trial | $0 | | 2 once | 0 | 2,500 words |
-| Creator | $29 | $24 ($290/yr) | 15 | 2 | 5,000 words |
-| **Pro** | $79 | $66 ($790/yr) | 50 | 8 | 12,500 words |
-| Studio | $199 | $166 ($1,990/yr) | 150 | 20 | 30,000 words |
-| Top-ups | 10 credits for $25 · 5 deep runs for $20 | | | | |
+| Plan | Monthly | Yearly (per month) | Credits | $ per 1,000 credits | About (standard scripts) | Longest script |
+| --- | --- | --- | --- | --- | --- | --- |
+| Free trial | $0 | | 300 once | n/a | 2 | 2,500 words |
+| **Starter** | $9.99 | $8.33 ($99.90/yr) | 1,000 | $9.99 | 6 | 2,500 words |
+| Creator | $24.99 | $20.83 ($249.90/yr) | 3,500 | $7.14 | 23 | 5,000 words |
+| **Pro** | $49.99 | $41.66 ($499.90/yr) | 9,000 | $5.55 | 60 | 12,500 words |
+| Studio | $149.99 | $124.99 ($1,499.90/yr) | 30,000 | $5.00 | 200 | 30,000 words |
+| Top-up | 2,000 credits for $25 ($12.50 per 1,000) | | | | | |
 
-Estimated gross margin at full use (monthly / yearly): Creator 60% / 52%, Pro 48% / 38%, Studio 44% / 33%; about 70% to 78% at half use. **Decision rule:** if measured cost per credit exceeds $0.75 or per deep run exceeds $3.00, cut quotas before raising prices.
+Estimated gross margin at full use (monthly / yearly): Starter 66% / 60%, Creator 57% / 49%, Pro 46% / 36%, Studio 41% / 30%; about 70% to 80% at half use. Why Pro is 9,000 and not 15,000: at 15,000 credits the Pro margin at full use falls to 12%.
+
+**Decision rule:** if measured cost per credit exceeds $0.0040 (about $0.60 per standard script) or a deep run costs more than $3.00, cut credit allowances before raising prices.
 
 ## 6. Roadmap
 
