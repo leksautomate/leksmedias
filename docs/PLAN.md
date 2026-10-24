@@ -1,10 +1,19 @@
-# Product plan: researched faceless scripts
+# leksmedias: product plan
 
-Working name: **ScriptForge** (one constant in `lib/site.ts`, rename freely).
+Researched faceless YouTube scripts. Type a topic, get a cited script.
+
+| Doc | What it covers |
+| --- | --- |
+| **This file** | Product, flow, architecture, pricing summary, roadmap, risks |
+| [`COSTS.md`](COSTS.md) | Verified Claude and TinyFish prices, cost of 10,000 and 25,000-word scripts, margins, capacity limits |
+| [`ADMIN.md`](ADMIN.md) | Admin area: roles, screens, cost and margin, capacity, security, phases |
+| [`UX.md`](UX.md) | User journey, onboarding, progress, result page, accessibility, metrics |
+| [`MCP.md`](MCP.md) | Using leksmedias from Claude Code, Codex, Antigravity, Hermes and other MCP agents |
+| [`cost-model.py`](cost-model.py) | Reproducible cost model. `python3 docs/cost-model.py` |
 
 ## 1. What we are building
 
-A web app where a creator types a topic and gets a fully researched faceless YouTube script.
+A web app where a creator types a topic and gets a fully researched faceless YouTube script, from a 1,800-word video up to a 25,000 to 30,000 word documentary.
 
 Every run produces two outputs of the same video:
 
@@ -13,50 +22,63 @@ Every run produces two outputs of the same video:
 | **A. With visuals** | Video editor | Timestamped sections, `[B-ROLL:]`, `[IMAGE:]`, `[CLIP:]`, `[TEXT ON SCREEN:]`, `[MUSIC:]` cues, hook and re-hooks marked |
 | **B. Clean + sources** | Voiceover / text-to-speech, fact-checking | Pure narration (no brackets, timestamps, speaker labels or URLs), then a separate **Sources and fact check** block: each claim mapped to a numbered source |
 
-Sources stay out of the narration on purpose. A TTS voice reads URLs aloud ("h-t-t-p-colon..."), so citations live in their own block.
+Sources stay out of the narration on purpose. A TTS voice reads URLs aloud, so citations live in their own block.
+
+Three ways to use it (details in [`MCP.md`](MCP.md)): the website, your own AI agent over MCP, or your agent plus your own TinyFish account.
 
 ## 2. User flow
 
-1. **Brief**: topic, format (documentary, listicle, exposé, true crime, video essay, explainer), length, niche, optional channel voice notes, optional own sources.
-2. **Research** (minutes, streamed): live plan and progress, then a cited report.
-3. **Fact ledger** (shown to the user, editable): the list of claims the script is allowed to use, each with source and confidence. Users can delete or add facts.
-4. **Outline** (optional approve step, required for long-form).
-5. **Script**: hook first, then sections.
+1. **Brief**: topic, format (documentary, listicle, exposé, true crime, video essay, explainer), length in words, niche, research depth (standard or deep), optional voice notes and own sources. A live cost line shows credits and deep runs before anything is spent.
+2. **Research** (minutes, streamed): real events from TinyFish shown as they happen.
+3. **Fact ledger** (shown, editable): the claims the script may use, each with source and confidence.
+4. **Outline** (optional approve step, shown by default above 5,000 words).
+5. **Script**: hook first, then sections of about 2,500 words.
 6. **Audit**: automatic anti-AI-pattern pass, shows what was fixed.
-7. **Result**: tabs for A and B, word count, estimated duration, export, regenerate a section.
+7. **Result**: tabs for A and B, word count, duration, export, regenerate a section.
+
+Full UX detail: [`UX.md`](UX.md).
 
 ## 3. Architecture
 
 - **App**: Next.js (App Router) + TypeScript + Tailwind. Landing and pricing are static; the app is server-rendered behind auth.
-- **Auth**: Clerk or Supabase Auth (decide at Phase 1).
-- **DB**: Postgres (Neon or Supabase) with Drizzle. Tables: `users`, `projects`, `runs`, `facts`, `sources`, `scripts`, `credit_ledger`, `subscriptions`.
-- **Jobs**: Inngest or Trigger.dev. Research takes minutes, so it cannot live in a request. Job emits progress events the UI subscribes to over SSE.
-- **Billing**: Stripe subscriptions plus a **credit ledger** (append-only rows: grant, reserve, spend, refund). Reserve credits at run start, settle on success, refund on failure.
-- **LLM**: Anthropic API. Static skill prompt first so it caches; research and brief after it. Route cheap steps (fact extraction, source mapping, lint) to a smaller model and keep the strongest model for hook and section writing.
+- **Auth**: Clerk or Supabase Auth (decide at Phase 1). Email verification gates free credits.
+- **DB**: Postgres (Neon or Supabase) with Drizzle. Core tables: `users`, `projects`, `runs`, `facts`, `sources`, `scripts`, `credit_ledger`, `subscriptions`, `api_keys`. Admin tables in [`ADMIN.md`](ADMIN.md).
+- **Jobs**: Inngest or Trigger.dev. Research takes 5 to 20 minutes, so it cannot live in a request. Jobs emit progress events the UI follows over SSE.
+- **Billing**: Stripe subscriptions plus an **append-only credit ledger** (grant, reserve, spend, refund) in tenths of a credit, with a second counter for deep runs. Reserve at run start, settle on success, refund on failure.
+- **LLM**: Anthropic API. The static skill prefix goes first so it caches (cache reads cost 5% of input on Sonnet 5.5). Haiku 5.5 for reading pages, extraction, mapping and lint; Sonnet 5.5 for outline, synthesis and default writing; Opus 5.5 as an optional "premium voice". See [`COSTS.md`](COSTS.md).
+- **MCP**: remote Streamable HTTP server in the same app at `/mcp`. See [`MCP.md`](MCP.md).
 
-### Research layer (TinyFish)
+### Research layer (TinyFish), verified against the docs
 
-Verified from the TinyFish docs:
+| API | Endpoint | Notes |
+| --- | --- | --- |
+| **Research** | `POST https://agent.tinyfish.ai/v1/automation/run-research` (SSE) or `run-research-async` | Header `X-API-Key`. `mode`: `deep` (5 to 20 min) or `max` (5 to 45 min). Also `output_language`, `domain_type` (`web`, `news`, `research_paper`), date filters, `domain_filter`, `prior_run_id` and `session_id` to continue a run. Report in `deep_result.result`, `citations` is an array of URLs. **$2 per deep run, $3 per max run**, first 2 runs per UTC day free, **5 concurrent**, 45-minute budget. Events kept 1 hour, so we persist them |
+| **Search** | `GET https://api.search.tinyfish.ai` | Free, 30 req/min, 500/hour |
+| **Fetch** | `POST https://api.fetch.tinyfish.ai` | Free, 150 URLs/min, **1,000 URLs/day** |
+| **Agent** | `https://agent.tinyfish.ai/v1/automation/...` | $0.016 per step. Only needed for interactive sites |
 
-- **Research API**: `POST https://agent.tinyfish.ai/v1/automation/run-research`, body `{ query, mode: "deep" }`, header `X-API-Key`. Streams SSE: `created` (has `research_run_id`) → `plan_updated` → `final_result` (`result` + `citations`) → `done`. Runs usually take several minutes.
-- **Search**: `GET https://api.search.tinyfish.ai`. Free, 30 req/min, 500 req/hour.
-- **Fetch**: `POST https://api.fetch.tinyfish.ai`. Free, 150 URLs/min, 1,000 URLs/day.
-- **Agent**: $0.016 per step, 2 concurrent runs by default (needed only if we later scrape logged-in or interactive sites).
+**Two research depths**
+- **Standard**: our own loop on Search + Fetch (Haiku reads the pages, Sonnet synthesises). Costs tokens only. Default.
+- **Deep**: TinyFish Research run(s). Number of runs scales with length (lean policy: 1 for up to 5,000 words, 2 for 10,000, 4 for 25,000, 5 for 30,000).
 
-Pipeline: `Research API (deep)` for the cited report, `Fetch` for any user-supplied URLs and to re-open key sources for exact quotes and dates, `Search` for gap filling. The citation field shape is not documented on the page I read, so Phase 0 must capture a real response and write the parser against it.
+The Research `citations` shape is not documented beyond "array of URLs", and the retrieval endpoint also returns `research_plan` and `evidence` (sources and the claims they support), which is exactly what the fact ledger needs. Phase 0 must capture real responses and write the parser against them.
 
 ### Grounding rule (the product's main promise)
 
-1. An LLM pass turns the research report into a **fact ledger**: `{id, claim, number/date, source_id, confidence}`.
-2. The writer may only state facts present in the ledger. Writer output carries hidden fact ids per sentence.
-3. A checker rejects any sentence with a number, date or proper noun that is not backed by a ledger id, and either removes it or flags it.
+1. An LLM pass turns research output into a **fact ledger**: `{id, claim, number/date, source_id, confidence}`.
+2. The writer may only state facts present in the ledger and tags each sentence with fact ids (hidden from users).
+3. A checker rejects any sentence with a number, date or proper noun not backed by a ledger id; it is removed or flagged.
 4. Output B's **Sources and fact check** block is generated from those ids, not written separately, so it cannot drift from the script.
 
-Output B is derived from output A by a deterministic strip (remove cue lines, timestamps, brackets), followed by a lint. One script, two renderings, same facts.
+Output B is derived from output A by a deterministic strip (remove cue lines, timestamps, brackets), then a lint. One script, two renderings, same facts.
 
-## 4. Using the scriptwriting knowledge base (the zip)
+### Long scripts (10,000 and 25,000 words)
 
-The 16 markdown files are prompt knowledge. Do not load all of them each run (~200 KB). Compose per run:
+The rulebook says never to write more than about 3,000 words per generation. So: one master research pass, an **approved outline**, then sections of about 2,500 words written in order, each given the full outline plus the previous section's last 2 to 3 sentences. After the last section a voice-consistency pass flags drift. A 25,000-word script is 10 sections.
+
+## 4. Using the scriptwriting rulebook (the zip)
+
+The 16 markdown files are prompt knowledge (~200 KB). Do not load all of them each run. Compose per run:
 
 | Always | By format | By niche / need |
 | --- | --- | --- |
@@ -68,75 +90,58 @@ Rules that become code, not just prompt text:
 - Max 2 to 3 colons per script; flag setup phrases before colons.
 - Flag "No X. No Y. No Z." fragments, "Most people..." openers, empty hype words, suspiciously specific percentages.
 - Hook under 100 words with a "But / However" turn.
-- Long-form: never more than about 3,000 words per generation. Write section by section, each call gets the full outline plus the previous section's last 2 to 3 sentences.
-- Output B: zero brackets, zero timestamps, numbers written as words for TTS.
+- Output B: zero brackets, zero timestamps, zero URLs, numbers written as words for TTS.
 
-**License check before launch.** These files were sold as a product ("What You Just Bought"). Check the license for commercial or SaaS reuse and for redistribution, or get written permission, before shipping their content or their name. The repo does not contain the files, and the landing page never uses their brand. If permission is not available, the same rules can be rewritten as our own prompt modules.
+**License check before launch.** These files were sold as a product. Check the license for commercial or SaaS use, and for handing the rules to third-party agents through MCP, or get written permission, before shipping their content or their name. The repo does not contain the files and the site never uses their brand. If permission is not available, rewrite the rules as our own prompt modules.
 
-## 5. Pricing
+## 5. Pricing summary
 
-Credit-based, matching how cost actually scales (research plus tokens per minute of script).
+Full reasoning and margin tables in [`COSTS.md`](COSTS.md). The landing and pricing pages already show this.
 
-- **1 credit = one finished script up to 12 minutes**, research and both outputs included. Each extra 12 minutes is one more credit (60 min = 5).
-- Failed runs refund the credits.
-- Yearly billing = 20% off, shown as the monthly equivalent with the yearly total underneath.
+- **1 credit = a finished script of up to 2,500 words** (about 17 min). 10,000 words = 4 credits, 25,000 words = 10.
+- **Deep research is a separate quota** because each TinyFish run is a fixed $2 to $3.
+- Yearly = **pay 10 months, get 12**.
 
-| Plan | Monthly | Yearly (per month) | Credits | $/credit (mo / yr) |
-| --- | --- | --- | --- | --- |
-| Free trial | $0 | $0 | 2 once | n/a |
-| Creator | $29 | $23 | 15 | $1.93 / $1.53 |
-| **Pro** (highlighted) | $79 | $63 | 50 | $1.58 / $1.26 |
-| Studio | $199 | $159 | 150 | $1.33 / $1.06 |
-| Top-up pack | $25 for 10 credits | | | $2.50 |
+| Plan | Monthly | Yearly (per month) | Credits | Deep runs | Longest script |
+| --- | --- | --- | --- | --- | --- |
+| Free trial | $0 | | 2 once | 0 | 2,500 words |
+| Creator | $29 | $24 ($290/yr) | 15 | 2 | 5,000 words |
+| **Pro** | $79 | $66 ($790/yr) | 50 | 8 | 12,500 words |
+| Studio | $199 | $166 ($1,990/yr) | 150 | 20 | 30,000 words |
+| Top-ups | 10 credits for $25 · 5 deep runs for $20 | | | | |
 
-Why this shape:
-
-- Three paid tiers with the middle one highlighted is the standard anchoring layout; Studio makes Pro look reasonable.
-- Price per credit falls as tiers rise, and top-ups cost more than any plan credit, so nobody buys top-ups instead of upgrading.
-- Long-form (over 24 minutes) and own-sources are gated to Pro because they cost the most to serve.
-- Free trial gives 2 credits (one full script) so people see the real output before paying. It is a one-time grant to limit abuse; add email verification and a card-less abuse check.
-
-### Margin sensitivity (assumption, must be measured)
-
-Cost per credit (LLM tokens + research) is **not yet measured**. The TinyFish page I read does not list a Research price, and I did not look up current LLM prices. Gross margin if every credit is used, monthly / yearly billing:
-
-| Plan | COGS $0.25/credit | COGS $0.50/credit | COGS $1.00/credit |
-| --- | --- | --- | --- |
-| Creator | 87% / 84% | 74% / 67% | 48% / 35% |
-| Pro | 84% / 80% | 68% / 60% | 37% / 21% |
-| Studio | 81% / 76% | 62% / 53% | 25% / 6% |
-
-Target: **COGS at or under $0.50 per credit** (prompt caching of the static skill prefix, a smaller model for extraction and lint, strongest model only for writing). Typical subscription breakage (unused credits) adds margin on top. **Phase 0 measures real cost on 20 scripts; if blended COGS lands above about $0.75, cut Studio to 100 credits before touching prices.** Also measure 60-minute scripts: sectioned writing re-sends context, so cost may grow faster than 5x.
+Estimated gross margin at full use (monthly / yearly): Creator 60% / 52%, Pro 48% / 38%, Studio 44% / 33%; about 70% to 78% at half use. **Decision rule:** if measured cost per credit exceeds $0.75 or per deep run exceeds $3.00, cut quotas before raising prices.
 
 ## 6. Roadmap
 
-**Phase 0: spike (2 to 3 days).** One script end to end on a CLI: TinyFish Research → ledger → script A → derive B → audit. Record real response shapes, latency and cost per credit. Decide go/no-go on the margin table.
+**Phase 0: spike (2 to 3 days).** One 10,000-word script end to end on a CLI: TinyFish Research and Search/Fetch loop → ledger → script A → derive B → audit. Record real response shapes, latency, tokens and cost per credit and per deep run. Compare standard vs deep research quality. Go/no-go on the margin table.
 
-**Phase 1: MVP.**
-Auth, brief form, streamed research progress, result page with two tabs, copy and TXT/MD export, credit ledger, Stripe checkout for the three plans, free trial.
+**Phase 1: MVP.** Auth, brief with live cost line, streamed research progress, result page with two tabs, copy and TXT/MD export, credit ledger, Stripe for the three plans, free trial, TinyFish queue (5 concurrent), **admin launch minimum** ([`ADMIN.md`](ADMIN.md) phase 1).
 
-**Phase 2: quality and retention.**
-Editable fact ledger, own sources, section regenerate, channel voice profiles, long-form sectioned writing, DOCX export, hook variations (3 options before full script).
+**Phase 2: quality and agents.** Editable fact ledger, own sources, section regenerate, voice profiles, long-form sectioned writing, DOCX export, hook alternatives. **MCP phase A and B** ([`MCP.md`](MCP.md)): rules, validation and research tools over API keys. Admin cost and margin, alerts, promo codes.
 
-**Phase 3: later features (from your notes).**
-Competitor transcript analysis, title and thumbnail ideas, fiction mode, team seats, batch queue, API.
+**Phase 3: scale.** MCP OAuth and Integrations page, packaged plugins for each agent, bring-your-own TinyFish key, pricing and prompt editors in admin, A/B on prompts and models.
+
+**Phase 4: later features (from your notes).** Competitor transcript analysis, title and thumbnail ideas, fiction mode, team seats, batch queue, public API.
 
 ## 7. Risks and open questions
 
 | Risk | Mitigation |
 | --- | --- |
-| Skill content license | Get permission or rewrite the rules as our own modules (section 4) |
-| TinyFish Research cost and limits unknown, free Fetch capped at 1,000 URLs/day | Measure in Phase 0, cap URLs fetched per run, ask TinyFish about volume pricing early |
+| Rulebook license | Get permission or rewrite as our own modules (section 4) |
+| TinyFish capacity: 5 concurrent research runs, 1,000 Fetch URLs a day | Queue with ETA, page cache, page caps, ask TinyFish to raise limits before launch, bring-your-own-key tier |
+| TinyFish Research must be enabled on the account (403 otherwise) and is billed from a wallet | Enable and fund before Phase 0; wallet-low alert |
 | Hallucinated facts | Grounding rule, checker, visible ledger, "verify before publishing" copy |
-| Quoting copyrighted source text | Store short excerpts and links only, paraphrase in scripts |
-| Free-trial abuse | Email verification, one grant per account, rate limits |
-| Research takes minutes | Background jobs, progress stream, email or push when done |
-| Topics with no public footage or facts | Pre-flight "enough sources?" check before spending credits |
-| Defamation risk on real people (true crime, exposé) | Flag allegations as allegations in the ledger, require a source for every claim about a living person |
+| Quoting copyrighted source text | Store short excerpts and links only; paraphrase in scripts |
+| Free-trial abuse | Email verification, one grant per account and device, rate limits |
+| Runaway agent spend over MCP | Per-key caps, scopes, idempotency keys, estimates before spend |
+| Defamation risk on real people (true crime, exposé) | Flag allegations as allegations in the ledger; require a source for every claim about a living person |
+| Cost assumptions are not yet measured | Phase 0 measurement, decision rule in section 5 |
 
 Open questions for you:
 
-1. Product name and domain (the landing page uses ScriptForge as a placeholder).
-2. The "sample" output you mentioned: I did not receive a file, so the landing sample is a short original Blockbuster vs Netflix script. Send the real sample and I will match its layout.
-3. Which voice-tool formats matter most for output B (plain TTS, or a specific video tool's import format)?
-4. Refund policy (a 7-day money-back guarantee is common for subscriptions and lifts conversion).
+1. The "sample" output you mentioned did not arrive as a file, so the landing sample is a short original Blockbuster vs Netflix script. Send the real sample and I will match its layout.
+2. Domain name (needed for real MCP setup commands and the canonical URL).
+3. Is agent mode (MCP) on every paid plan or Pro and up?
+4. Who else will use the admin, and do you want Support and Finance roles at launch?
+5. Refund policy (a 7-day money-back guarantee is common and lifts conversion).

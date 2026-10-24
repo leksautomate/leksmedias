@@ -1,10 +1,19 @@
-# ScriptForge (working name)
+# leksmedias
 
 Researched faceless YouTube scripts. Type a topic, get a cited script in two versions:
 one with visual cues for the editor, one clean for voiceover with a sources block.
 
-This repo currently contains the **landing page** and **pricing page**. The product plan is in
-[`docs/PLAN.md`](docs/PLAN.md).
+This repo currently contains the **landing page** and **pricing page**. The plans are in `docs/`:
+
+| Doc | What it covers |
+| --- | --- |
+| [`PLAN.md`](docs/PLAN.md) | Product, flow, architecture, roadmap, risks |
+| [`COSTS.md`](docs/COSTS.md) | Real Claude and TinyFish costs, 10,000 and 25,000-word scripts, margins |
+| [`ADMIN.md`](docs/ADMIN.md) | Admin area plan |
+| [`UX.md`](docs/UX.md) | User experience plan |
+| [`MCP.md`](docs/MCP.md) | Use from Claude Code, Codex, Antigravity, Hermes and other agents |
+
+Re-run the cost model any time prices change: `python3 docs/cost-model.py`.
 
 ## Run it
 

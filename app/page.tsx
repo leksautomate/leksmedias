@@ -17,7 +17,7 @@ const STEPS = [
   {
     n: "2",
     title: "AI researches the web",
-    body: "TinyFish's research agent reads live pages, weighs the sources and returns a cited report. You watch the plan build in real time.",
+    body: "TinyFish reads live pages, weighs the sources and returns cited facts. Pick standard or deep research. You watch the plan build in real time.",
   },
   {
     n: "3",
@@ -45,7 +45,7 @@ const FEATURES = [
   },
   {
     title: "Long-form, kept consistent",
-    body: "Hour-long scripts are written section by section, each anchored to the last, so the voice and the facts do not drift.",
+    body: "Scripts of 10,000 or even 25,000 words are written section by section, each anchored to the last, so the voice and the facts do not drift.",
   },
   {
     title: "Your sources, your call",
@@ -56,7 +56,7 @@ const FEATURES = [
 const HOME_FAQ = [
   {
     q: "Where does the research come from?",
-    a: "TinyFish's research agent searches the live web, reads the pages, ranks the sources and returns a report with citations. Every factual line in your script maps back to one of those sources, and you can open each one.",
+    a: "TinyFish searches the live web, reads the pages and returns cited facts. Standard research does that for a focused set of sources. Deep research sends TinyFish's research agent out for 5 to 20 minutes across far more. Every factual line in your script maps back to a source you can open.",
   },
   {
     q: "What do I get from one run?",
@@ -76,7 +76,11 @@ const HOME_FAQ = [
   },
   {
     q: "What is a credit?",
-    a: "One credit is one finished script of up to 12 minutes, research and both versions included. Longer scripts use one more credit for every extra 12 minutes.",
+    a: "One credit is a finished script of up to 2,500 words, about 17 minutes of narration, with research and both versions included. A 10,000-word script uses 4 credits and a 25,000-word script uses 10.",
+  },
+  {
+    q: "Can I use my own AI agent instead?",
+    a: "That is on the roadmap for paid plans. You will connect leksmedias to Claude Code, Codex, Antigravity, Hermes or any agent that supports MCP. Your agent calls our research, writing rules and checks, and writes with your own subscription.",
   },
   {
     q: "Which topics work best?",
@@ -168,6 +172,34 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Research depth */}
+        <section id="research" className="divider px-5 py-20 sm:px-8">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="text-center text-3xl font-bold sm:text-5xl">Choose how deep the research goes</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-soft">
+              Both are powered by TinyFish and both cite every source. Pick per script.
+            </p>
+            <div className="mt-12 grid gap-5 md:grid-cols-2">
+              <div className="rounded-lg border border-panel-4 bg-panel p-7">
+                <p className="text-xs font-bold uppercase tracking-widest text-soft">Included in every credit</p>
+                <h3 className="mt-3 text-2xl font-bold">Standard research</h3>
+                <p className="mt-3 text-soft">
+                  Searches the live web, reads the strongest pages and builds a cited fact list. Ready in a few minutes,
+                  right for most videos.
+                </p>
+              </div>
+              <div className="rounded-lg border-2 border-brand bg-panel-2 p-7">
+                <p className="text-xs font-bold uppercase tracking-widest text-brand">For your flagship videos</p>
+                <h3 className="mt-3 text-2xl font-bold">Deep research</h3>
+                <p className="mt-3 text-soft">
+                  TinyFish&apos;s research agent works for 5 to 20 minutes across far more sources, then cross-checks
+                  them. Built for long documentaries, with more runs the longer the script.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Formats */}
         <section className="divider overflow-hidden px-5 py-20 sm:px-8">
           <div className="mx-auto max-w-6xl">
@@ -178,6 +210,26 @@ export default function Home() {
             <div className="mt-10">
               <FormatRow />
             </div>
+          </div>
+        </section>
+
+        {/* Agents */}
+        <section id="agents" className="divider px-5 py-20 sm:px-8">
+          <div className="mx-auto max-w-6xl text-center">
+            <p className="inline-block rounded-full border border-line px-4 py-1 text-sm text-soft">Coming soon</p>
+            <h2 className="mt-5 text-3xl font-bold sm:text-5xl">Bring your own AI agent</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-soft">
+              Prefer to work from your terminal or IDE? Connect {SITE.name} over MCP. Your agent calls our research,
+              writing rules and checks, and writes with your own subscription.
+            </p>
+            <ul className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
+              {["Claude Code", "Codex", "Antigravity", "Hermes"].map((n) => (
+                <li key={n} className="rounded-lg bg-panel-2 px-4 py-5 text-lg font-bold">
+                  {n}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 text-sm text-mute">Works with any agent that supports MCP.</p>
           </div>
         </section>
 
@@ -201,7 +253,7 @@ export default function Home() {
           <div className="mx-auto max-w-6xl">
             <h2 className="text-center text-3xl font-bold sm:text-5xl">Simple pricing, paid per script</h2>
             <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-soft">
-              One credit is one finished script of up to 12 minutes, research and both versions included.
+              One credit is 2,500 words of script. Cited research and both versions are always included.
             </p>
             <div className="mt-12">
               <PricingTable />

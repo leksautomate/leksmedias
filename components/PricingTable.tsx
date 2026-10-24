@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { PLANS, perCredit } from "@/lib/pricing";
+import { PLANS, perCredit, yearlyPerMonth, yearlyTotal } from "@/lib/pricing";
 
-const usd = (n: number, digits = 0) => `$${n.toFixed(digits)}`;
+const usd = (n: number, digits = 0) =>
+  `$${n.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 
 export function PricingTable() {
   const [yearly, setYearly] = useState(true);
@@ -33,7 +34,7 @@ export function PricingTable() {
                     yearly ? "bg-brand text-white" : "bg-panel-4 text-white"
                   }`}
                 >
-                  Save 20%
+                  2 months free
                 </span>
               )}
             </button>
@@ -43,7 +44,7 @@ export function PricingTable() {
 
       <ul className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {PLANS.map((p) => {
-          const price = yearly ? p.yearly : p.monthly;
+          const price = yearly ? yearlyPerMonth(p) : p.monthly;
           const cpc = perCredit(p, yearly);
           return (
             <li
@@ -68,15 +69,21 @@ export function PricingTable() {
                 {p.monthly === 0
                   ? "No card required"
                   : yearly
-                    ? `Billed ${usd(p.yearly * 12)} per year`
+                    ? `Billed ${usd(yearlyTotal(p))} per year`
                     : "Billed monthly, cancel any time"}
               </p>
 
-              <p className="mt-5 rounded bg-black/40 px-3 py-2 text-sm">
-                <span className="font-bold">{p.credits} credits</span>
-                <span className="text-soft">{p.creditsOneTime ? " one time" : " every month"}</span>
-                {cpc > 0 && <span className="text-mute"> · {usd(cpc, 2)} each</span>}
-              </p>
+              <div className="mt-5 space-y-1 rounded bg-black/40 px-3 py-2 text-sm">
+                <p>
+                  <span className="font-bold">{p.credits} credits</span>
+                  <span className="text-soft">{p.oneTime ? " one time" : " every month"}</span>
+                  {cpc > 0 && <span className="text-mute"> · {usd(cpc, 2)} each</span>}
+                </p>
+                <p className="text-soft">
+                  <span className="font-bold text-white">{p.deepRuns > 0 ? `${p.deepRuns} deep research runs` : "Standard research"}</span>
+                  {p.deepRuns > 0 && !p.oneTime ? " a month" : ""}
+                </p>
+              </div>
 
               <Link
                 href="/#early-access"

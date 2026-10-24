@@ -1,6 +1,6 @@
 // Single place to rename the product. Everything user-facing reads from here.
 export const SITE = {
-  name: "ScriptForge",
+  name: "leksmedias",
   tagline: "Faceless scripts, researched for you.",
   description:
     "Give it a topic. AI reads the live web, cites every source, and writes a retention-built faceless YouTube script in two versions: one with visual cues for your editor, one clean for voiceover.",

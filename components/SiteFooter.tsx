@@ -29,7 +29,7 @@ export function SiteFooter() {
       </div>
       <p className="mt-10 text-xs">
         © {new Date().getFullYear()} {SITE.name}. Research powered by TinyFish. {SITE.name} is an independent product
-        and is not affiliated with or endorsed by TinyFish.
+        and is not affiliated with or endorsed by TinyFish. Other product names belong to their owners.
       </p>
     </footer>
   );

@@ -4,7 +4,7 @@ import { Faq } from "@/components/Faq";
 import { Logo } from "@/components/SiteHeader";
 import { PricingTable } from "@/components/PricingTable";
 import { SiteFooter } from "@/components/SiteFooter";
-import { COMPARISON, CREDIT_RULES, PLANS, PRICING_FAQ, TOP_UP } from "@/lib/pricing";
+import { COMPARISON, CREDIT_RULES, DEEP_PACK, PLANS, PRICING_FAQ, TOP_UP } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -56,7 +56,7 @@ export default function PricingPage() {
               Pay for finished scripts, not for guesses
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-balance text-center text-lg text-soft sm:text-2xl">
-              Every credit includes cited research, a script with visual cues and a clean script with sources.
+              One credit is 2,500 words of script. Cited research and both versions are always included.
             </p>
             <div className="mt-12">
               <PricingTable />
@@ -70,42 +70,61 @@ export default function PricingPage() {
             <div className="min-w-0">
               <h2 className="text-3xl font-bold sm:text-4xl">How credits work</h2>
               <p className="mt-4 text-lg text-soft">
-                One credit buys one finished script of up to 12 minutes. Longer scripts cost one more credit for every
-                extra 12 minutes. Research and both versions are always included, and failed runs are refunded.
+                One credit pays for a finished script of up to 2,500 words, about 17 minutes of narration. Longer
+                scripts are written section by section and use one credit per section. Standard research and both
+                versions are always included, and failed runs are refunded.
               </p>
-              <p className="mt-6 rounded-lg bg-panel-2 p-5 text-soft">
-                <span className="font-bold text-white">Need more?</span> Top up {TOP_UP.credits} credits for ${TOP_UP.price}.
-                Top-up credits never expire.
+              <p className="mt-4 text-lg text-soft">
+                <span className="font-bold text-white">Deep research</span> sends TinyFish&apos;s research agent to work
+                for 5 to 20 minutes across far more sources. It is counted separately from credits because every run
+                has a real cost behind it, so each plan includes a set number per month.
               </p>
+              <ul className="mt-6 space-y-3 text-soft">
+                <li className="rounded-lg bg-panel-2 p-5">
+                  <span className="font-bold text-white">Need more credits?</span> {TOP_UP.credits} credits for $
+                  {TOP_UP.price}. They never expire.
+                </li>
+                <li className="rounded-lg bg-panel-2 p-5">
+                  <span className="font-bold text-white">Need more deep runs?</span> {DEEP_PACK.runs} runs for $
+                  {DEEP_PACK.price}. They never expire.
+                </li>
+              </ul>
             </div>
             <div className="relative min-w-0 overflow-x-auto">
-              <table className="w-full min-w-[22rem] text-left">
-                <caption className="sr-only">Credits per script length</caption>
+              <table className="w-full min-w-[26rem] text-left">
+                <caption className="sr-only">Credits and deep research runs by script length</caption>
                 <thead className="text-sm text-mute">
                   <tr className="border-b border-panel-4">
                     <th scope="col" className="py-3 pr-4 font-normal">
-                      Script length
+                      Script
                     </th>
                     <th scope="col" className="py-3 pr-4 font-normal">
-                      Roughly
+                      Narration
+                    </th>
+                    <th scope="col" className="py-3 pr-4 text-right font-normal">
+                      Credits
                     </th>
                     <th scope="col" className="py-3 text-right font-normal">
-                      Credits
+                      Deep runs
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {CREDIT_RULES.map((r) => (
-                    <tr key={r.length} className="border-b border-panel-2">
+                    <tr key={r.words} className="border-b border-panel-2">
                       <th scope="row" className="py-4 pr-4 font-bold">
-                        {r.length}
+                        {r.words.toLocaleString("en-US")} words
                       </th>
-                      <td className="py-4 pr-4 text-soft">{r.words}</td>
-                      <td className="py-4 text-right text-xl font-bold">{r.credits}</td>
+                      <td className="py-4 pr-4 text-soft">{r.time}</td>
+                      <td className="py-4 pr-4 text-right text-xl font-bold">{r.credits}</td>
+                      <td className="py-4 text-right text-xl font-bold">{r.deepRuns}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              <p className="mt-3 text-sm text-mute">
+                Deep runs only apply when you pick deep research. Standard research uses none.
+              </p>
             </div>
           </div>
         </section>
