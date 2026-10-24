@@ -5,11 +5,11 @@ import { SITE } from "@/lib/site";
 export const LEGAL = {
   product: SITE.name,
   /** Legal name of the company that runs the service, e.g. "Leksmedia LLC". */
-  entity: "",
+  entity: "Leksmedias (operated by Babatude Lekan)",
   /** Registered or mailing address. */
   address: "",
   /** Support and privacy contact. */
-  email: "",
+  email: "support@leksmedias.com",
   /** Governing law and courts, e.g. "the State of Delaware, USA". */
   jurisdiction: "",
   updated: "October 24, 2026",

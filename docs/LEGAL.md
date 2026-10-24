@@ -10,10 +10,10 @@ Anything left empty shows on the page as a gold `[placeholder]`, so it is hard t
 
 | Setting | What to put |
 | --- | --- |
-| `entity` | Legal name of the company that sells the service (for example "Leksmedia LLC"). A personal name works if you have no company yet, but a company limits your liability |
-| `address` | Registered or mailing address (the law in many countries requires one) |
-| `email` | A real support and privacy mailbox that someone reads |
-| `jurisdiction` | Governing law and courts, for example "the State of Delaware, USA" |
+| `entity` | **Done:** "Leksmedias (operated by Babatude Lekan)". If Leksmedias is a registered company, replace this with its exact registered name (for example "Leksmedias Ltd"). Trading as a person or sole proprietor means you are personally liable, so a company is worth setting up |
+| `address` | **Still needed.** Registered or mailing address (the law in many countries requires one) |
+| `email` | **Done:** support@leksmedias.com. Make sure this mailbox exists and is monitored, because the privacy and refund pages tell people to write to it |
+| `jurisdiction` | **Still needed.** Governing law and courts, for example "England and Wales" or "the State of Delaware, USA". Use where the business is based or registered |
 
 ## 2. Business decisions I made as defaults (change them if you disagree)
 
