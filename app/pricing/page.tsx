@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Faq } from "@/components/Faq";
-import { Logo } from "@/components/SiteHeader";
 import { PricingTable } from "@/components/PricingTable";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { COMPARISON, CREDIT_RULES, DEEP_PACK, PLANS, PRICING_FAQ, TOP_UP } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -16,113 +16,113 @@ function Cell({ v }: { v: string | boolean }) {
   if (v === true)
     return (
       <>
-        <span aria-hidden="true" className="text-brand">
-          ✓
-        </span>
-        <span className="sr-only">Included</span>
+        <span className="text-good">Included</span>
       </>
     );
   if (v === false)
     return (
       <>
-        <span aria-hidden="true" className="text-mute">
+        <span aria-hidden="true" className="text-dim">
           –
         </span>
         <span className="sr-only">Not included</span>
       </>
     );
-  return <>{v}</>;
+  if (v === "Soon") return <span className="text-gold">Soon</span>;
+  return <span className="text-ink">{v}</span>;
 }
 
 export default function PricingPage() {
   return (
     <>
-      <header className="border-b border-panel">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
-          <Logo />
-          <Link
-            href="/#early-access"
-            className="whitespace-nowrap rounded bg-brand px-4 py-2 text-sm font-bold transition-colors hover:bg-brand-hover"
-          >
-            Get early access
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main>
-        <section className="divider px-5 pb-20 pt-16 sm:px-8">
+        <section className="relative isolate overflow-hidden px-5 pb-24 pt-20 sm:px-8">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_55%_40%_at_50%_0%,rgb(184_150_90/0.14),transparent_70%)]"
+          />
           <div className="mx-auto max-w-6xl">
-            <h1 className="text-balance text-center text-4xl font-bold tracking-tight sm:text-[3.5rem]">
-              Pay for finished scripts, not for guesses
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-balance text-center text-lg text-soft sm:text-2xl">
-              One credit is 2,500 words of script. Cited research and both versions are always included.
-            </p>
-            <div className="mt-12">
+            <div className="text-center">
+              <p className="eyebrow">Self-serve software pricing</p>
+              <h1 className="h-display mx-auto mt-4 max-w-3xl text-5xl sm:text-6xl">
+                Pay for finished scripts, <em>not for guesses.</em>
+              </h1>
+              <p className="mx-auto mt-6 max-w-2xl text-lg text-soft">
+                One credit is 2,500 words of script. Cited research and both versions are always included.
+              </p>
+            </div>
+            <div className="mt-14">
               <PricingTable />
             </div>
           </div>
         </section>
 
         {/* Credits explainer */}
-        <section className="divider px-5 py-20 sm:px-8">
-          <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2">
+        <section className="border-t border-line px-5 py-24 sm:px-8">
+          <div className="mx-auto grid max-w-6xl gap-14 lg:grid-cols-2">
             <div className="min-w-0">
-              <h2 className="text-3xl font-bold sm:text-4xl">How credits work</h2>
-              <p className="mt-4 text-lg text-soft">
-                One credit pays for a finished script of up to 2,500 words, about 17 minutes of narration. Longer
-                scripts are written section by section and use one credit per section. Standard research and both
-                versions are always included, and failed runs are refunded.
+              <p className="eyebrow">Credits</p>
+              <h2 className="h-display mt-4 text-4xl">
+                How credits <em>work.</em>
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed text-soft">
+                One credit pays for a finished script of up to 2,500 words, about 17 minutes of narration. Longer scripts
+                are written section by section and use one credit per section. Standard research and both versions are
+                always included, and failed runs are refunded.
               </p>
-              <p className="mt-4 text-lg text-soft">
-                <span className="font-bold text-white">Deep research</span> sends TinyFish&apos;s research agent to work
-                for 5 to 20 minutes across far more sources. It is counted separately from credits because every run
-                has a real cost behind it, so each plan includes a set number per month.
+              <p className="mt-4 leading-relaxed text-soft">
+                <span className="font-medium text-white">Deep research</span> sends TinyFish&apos;s research agent to work
+                for 5 to 20 minutes across far more sources. It is counted separately from credits because every run has
+                a real cost behind it, so each plan includes a set number per month.
               </p>
-              <ul className="mt-6 space-y-3 text-soft">
-                <li className="rounded-lg bg-panel-2 p-5">
-                  <span className="font-bold text-white">Need more credits?</span> {TOP_UP.credits} credits for $
+              <ul className="mt-7 space-y-3 text-soft">
+                <li className="card p-5">
+                  <span className="font-medium text-white">Need more credits?</span> {TOP_UP.credits} credits for $
                   {TOP_UP.price}. They never expire.
                 </li>
-                <li className="rounded-lg bg-panel-2 p-5">
-                  <span className="font-bold text-white">Need more deep runs?</span> {DEEP_PACK.runs} runs for $
+                <li className="card p-5">
+                  <span className="font-medium text-white">Need more deep runs?</span> {DEEP_PACK.runs} runs for $
                   {DEEP_PACK.price}. They never expire.
                 </li>
               </ul>
             </div>
             <div className="relative min-w-0 overflow-x-auto">
-              <table className="w-full min-w-[26rem] text-left">
-                <caption className="sr-only">Credits and deep research runs by script length</caption>
-                <thead className="text-sm text-mute">
-                  <tr className="border-b border-panel-4">
-                    <th scope="col" className="py-3 pr-4 font-normal">
-                      Script
-                    </th>
-                    <th scope="col" className="py-3 pr-4 font-normal">
-                      Narration
-                    </th>
-                    <th scope="col" className="py-3 pr-4 text-right font-normal">
-                      Credits
-                    </th>
-                    <th scope="col" className="py-3 text-right font-normal">
-                      Deep runs
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {CREDIT_RULES.map((r) => (
-                    <tr key={r.words} className="border-b border-panel-2">
-                      <th scope="row" className="py-4 pr-4 font-bold">
-                        {r.words.toLocaleString("en-US")} words
+              <div className="card min-w-[26rem] overflow-hidden">
+                <table className="w-full text-left font-mono text-sm">
+                  <caption className="sr-only">Credits and deep research runs by script length</caption>
+                  <thead className="bg-elevated text-[11px] uppercase tracking-[0.14em] text-white">
+                    <tr className="border-b border-line">
+                      <th scope="col" className="px-5 py-4 font-normal">
+                        Script
                       </th>
-                      <td className="py-4 pr-4 text-soft">{r.time}</td>
-                      <td className="py-4 pr-4 text-right text-xl font-bold">{r.credits}</td>
-                      <td className="py-4 text-right text-xl font-bold">{r.deepRuns}</td>
+                      <th scope="col" className="px-3 py-4 font-normal">
+                        Narration
+                      </th>
+                      <th scope="col" className="px-3 py-4 text-right font-normal">
+                        Credits
+                      </th>
+                      <th scope="col" className="px-5 py-4 text-right font-normal">
+                        Deep runs
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="mt-3 text-sm text-mute">
+                  </thead>
+                  <tbody>
+                    {CREDIT_RULES.map((r) => (
+                      <tr key={r.words} className="border-b border-line last:border-0">
+                        <th scope="row" className="px-5 py-4 font-medium text-white">
+                          {r.words.toLocaleString("en-US")} words
+                        </th>
+                        <td className="px-3 py-4 text-soft">{r.time}</td>
+                        <td className="px-3 py-4 text-right text-good">{r.credits}</td>
+                        <td className="px-5 py-4 text-right text-gold">{r.deepRuns}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-3 font-mono text-[11px] text-mute">
                 Deep runs only apply when you pick deep research. Standard research uses none.
               </p>
             </div>
@@ -130,66 +130,81 @@ export default function PricingPage() {
         </section>
 
         {/* Comparison */}
-        <section className="divider px-5 py-20 sm:px-8">
+        <section className="border-t border-line px-5 py-24 sm:px-8">
           <div className="mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold sm:text-4xl">Compare plans</h2>
-            <div className="relative mt-8 overflow-x-auto">
-              <table className="w-full min-w-[40rem] text-left">
-                <caption className="sr-only">Plan comparison</caption>
-                <thead>
-                  <tr className="border-b border-panel-4">
-                    <td className="py-4" />
-                    {PLANS.map((p) => (
-                      <th
-                        key={p.id}
-                        scope="col"
-                        className={`px-3 py-4 text-center text-lg font-bold ${p.featured ? "text-brand" : ""}`}
-                      >
-                        {p.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPARISON.map((row) => (
-                    <tr key={row.label} className="border-b border-panel-2">
-                      <th scope="row" className="py-4 pr-4 font-normal text-soft">
-                        {row.label}
+            <div className="text-center">
+              <p className="eyebrow">Side-by-side matrix</p>
+              <h2 className="h-display mt-4 text-4xl">Compare plan capabilities</h2>
+              <p className="mt-3 text-sm text-soft">Transparent software capabilities designed to scale with your volume.</p>
+            </div>
+            <div className="relative mt-12 overflow-x-auto">
+              <div className="card min-w-[44rem] overflow-hidden">
+                <table className="w-full text-left font-mono text-sm">
+                  <caption className="sr-only">Plan comparison</caption>
+                  <thead className="bg-elevated text-[11px] uppercase tracking-[0.14em]">
+                    <tr className="border-b border-line">
+                      <th scope="col" className="px-5 py-4 font-normal text-white">
+                        Capabilities
                       </th>
                       {PLANS.map((p) => (
-                        <td key={p.id} className="px-3 py-4 text-center">
-                          <Cell v={row.values[p.id]} />
-                        </td>
+                        <th
+                          key={p.id}
+                          scope="col"
+                          className={`px-3 py-4 font-normal ${p.featured ? "text-gold" : "text-white"}`}
+                        >
+                          {p.name}
+                          {p.monthly > 0 && <span className="text-mute"> (${p.monthly}/mo)</span>}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {COMPARISON.map((row) => (
+                      <tr key={row.label} className="border-b border-line last:border-0">
+                        <th scope="row" className="px-5 py-4 font-medium text-white">
+                          {row.label}
+                        </th>
+                        {PLANS.map((p) => (
+                          <td key={p.id} className="px-3 py-4">
+                            <Cell v={row.values[p.id]} />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="divider px-5 py-20 sm:px-8">
-          <h2 className="text-center text-3xl font-bold sm:text-4xl">Pricing questions</h2>
-          <div className="mt-10">
+        <section className="border-t border-line px-5 py-24 sm:px-8">
+          <div className="text-center">
+            <p className="eyebrow">Pricing FAQ</p>
+            <h2 className="h-display mt-4 text-4xl">
+              Pricing <em>questions.</em>
+            </h2>
+          </div>
+          <div className="mt-12">
             <Faq items={PRICING_FAQ} />
           </div>
         </section>
 
-        <section className="px-5 py-20 text-center sm:px-8">
-          <h2 className="text-3xl font-bold sm:text-4xl">Try a full script before you pay</h2>
-          <p className="mt-3 text-lg text-soft">Two free credits. No card required.</p>
-          <Link
-            href="/#early-access"
-            className="mt-7 inline-block rounded bg-brand px-8 py-4 text-xl font-bold transition-colors hover:bg-brand-hover"
-          >
-            Get early access
+        <section className="relative isolate overflow-hidden border-t border-line px-5 py-24 text-center sm:px-8">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_50%_60%_at_50%_100%,rgb(184_150_90/0.14),transparent_70%)]"
+          />
+          <h2 className="h-display text-4xl sm:text-5xl">
+            Try a full script <em>before you pay.</em>
+          </h2>
+          <p className="mt-4 text-lg text-soft">Two free credits. No card required.</p>
+          <Link href="/#early-access" className="btn btn-primary mt-8">
+            Get early access <span aria-hidden="true">→</span>
           </Link>
         </section>
       </main>
-      <div className="border-t-8 border-panel">
-        <SiteFooter />
-      </div>
+      <SiteFooter />
     </>
   );
 }

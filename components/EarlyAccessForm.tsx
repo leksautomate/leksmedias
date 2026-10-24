@@ -33,7 +33,7 @@ export function EarlyAccessForm({ source, id }: { source: string; id: string }) 
 
   if (state === "done") {
     return (
-      <p role="status" className="rounded bg-panel-2 px-5 py-4 text-lg">
+      <p role="status" className="mx-auto max-w-xl rounded-full border border-gold/30 bg-gold-soft px-6 py-4 text-base text-ink">
         You are on the list. We will email you when early access opens.
       </p>
     );
@@ -53,7 +53,7 @@ export function EarlyAccessForm({ source, id }: { source: string; id: string }) 
             required
             autoComplete="email"
             placeholder="Email address"
-            className="h-14 w-full rounded border border-line bg-black/60 px-4 text-base text-white placeholder:text-mute"
+            className="h-14 w-full rounded-full border border-line-strong bg-card px-6 text-base text-ink placeholder:text-mute focus:border-gold"
             aria-describedby={state === "error" ? `${id}-error` : undefined}
           />
           {/* honeypot, hidden from people */}
@@ -68,12 +68,12 @@ export function EarlyAccessForm({ source, id }: { source: string; id: string }) 
         <button
           type="submit"
           disabled={state === "loading"}
-          className="h-14 rounded bg-brand px-7 text-xl font-bold text-white transition-colors hover:bg-brand-hover disabled:opacity-60"
+          className="btn btn-primary h-14 disabled:opacity-60"
         >
-          {state === "loading" ? "Joining..." : "Get early access"}
+          {state === "loading" ? "Joining..." : <>Get early access <span aria-hidden="true">→</span></>}
         </button>
       </div>
-      <p id={`${id}-error`} role="alert" className="mt-3 min-h-5 text-sm text-[#ff6b73]">
+      <p id={`${id}-error`} role="alert" className="mt-3 min-h-5 text-sm text-bad">
         {state === "error" ? message : ""}
       </p>
     </form>

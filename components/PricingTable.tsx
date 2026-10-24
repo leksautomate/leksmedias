@@ -13,7 +13,7 @@ export function PricingTable() {
   return (
     <div>
       <div className="flex justify-center">
-        <div role="group" aria-label="Billing period" className="inline-flex rounded-full bg-panel-2 p-1">
+        <div role="group" aria-label="Billing period" className="inline-flex rounded-full border border-line bg-elevated p-1">
           {[
             { v: false, label: "Monthly" },
             { v: true, label: "Yearly" },
@@ -23,15 +23,15 @@ export function PricingTable() {
               type="button"
               aria-pressed={yearly === o.v}
               onClick={() => setYearly(o.v)}
-              className={`rounded-full px-5 py-2 text-sm font-bold transition-colors ${
-                yearly === o.v ? "bg-white text-black" : "text-soft hover:text-white"
+              className={`rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                yearly === o.v ? "bg-white text-bg" : "text-soft hover:text-white"
               }`}
             >
               {o.label}
               {o.v && (
                 <span
-                  className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                    yearly ? "bg-brand text-white" : "bg-panel-4 text-white"
+                  className={`ml-2 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase ${
+                    yearly ? "bg-gold text-bg" : "bg-gold-dim text-gold"
                   }`}
                 >
                   2 months free
@@ -42,30 +42,33 @@ export function PricingTable() {
         </div>
       </div>
 
-      <ul className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <ul className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {PLANS.map((p) => {
           const price = yearly ? yearlyPerMonth(p) : p.monthly;
           const cpc = perCredit(p, yearly);
           return (
             <li
               key={p.id}
-              className={`relative flex flex-col rounded-lg p-6 ${
-                p.featured ? "border-2 border-brand bg-panel-2" : "border border-panel-4 bg-panel"
+              className={`card relative flex flex-col p-7 ${
+                p.featured ? "border-gold shadow-[0_0_60px_-24px_var(--color-gold-glow)]" : ""
               }`}
+              style={p.featured ? { borderColor: "var(--color-gold)", borderWidth: 2 } : undefined}
             >
               {p.featured && (
-                <span className="absolute -top-3 left-6 rounded bg-brand px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gold px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-bg">
                   Most popular
                 </span>
               )}
-              <h3 className="text-xl font-bold">{p.name}</h3>
+              <h3 className="font-serif text-2xl text-white">{p.name}</h3>
               <p className="mt-1 min-h-10 text-sm text-soft">{p.blurb}</p>
 
-              <p className="mt-5 flex items-baseline gap-1">
-                <span className="text-5xl font-bold tracking-tight">{usd(price)}</span>
-                {p.monthly > 0 && <span className="text-soft">/ month</span>}
+              <p className="mt-6 flex items-baseline gap-2">
+                <span className={`font-serif text-5xl italic ${p.featured ? "text-gold" : "text-white"}`}>
+                  {usd(price)}
+                </span>
+                {p.monthly > 0 && <span className="font-mono text-xs text-mute">/ month</span>}
               </p>
-              <p className="mt-1 min-h-5 text-sm text-mute">
+              <p className="mt-1 min-h-5 font-mono text-[11px] text-mute">
                 {p.monthly === 0
                   ? "No card required"
                   : yearly
@@ -73,44 +76,38 @@ export function PricingTable() {
                     : "Billed monthly, cancel any time"}
               </p>
 
-              <div className="mt-5 space-y-1 rounded bg-black/40 px-3 py-2 text-sm">
+              <div className="mt-5 space-y-1 rounded-lg border border-line bg-elevated px-3 py-2.5 font-mono text-xs">
                 <p>
-                  <span className="font-bold">{p.credits} credits</span>
-                  <span className="text-soft">{p.oneTime ? " one time" : " every month"}</span>
+                  <span className="font-semibold text-white">{p.credits} credits</span>
+                  <span className="text-soft">{p.oneTime ? " one time" : " / month"}</span>
                   {cpc > 0 && <span className="text-mute"> · {usd(cpc, 2)} each</span>}
                 </p>
                 <p className="text-soft">
-                  <span className="font-bold text-white">{p.deepRuns > 0 ? `${p.deepRuns} deep research runs` : "Standard research"}</span>
-                  {p.deepRuns > 0 && !p.oneTime ? " a month" : ""}
+                  <span className="font-semibold text-white">
+                    {p.deepRuns > 0 ? `${p.deepRuns} deep runs` : "Standard research"}
+                  </span>
+                  {p.deepRuns > 0 && !p.oneTime ? " / month" : ""}
                 </p>
               </div>
 
               <Link
                 href="/#early-access"
-                className={`mt-5 block rounded px-4 py-3 text-center font-bold transition-colors ${
-                  p.featured
-                    ? "bg-brand text-white hover:bg-brand-hover"
-                    : "bg-panel-4 text-white hover:bg-[#4a4a4a]"
-                }`}
+                className={`btn mt-5 w-full ${p.featured ? "btn-primary" : "btn-ghost"}`}
               >
-                {p.cta}
+                {p.cta} <span aria-hidden="true">→</span>
               </Link>
 
-              <ul className="mt-6 space-y-3 text-sm">
+              <ul className="mt-6 space-y-3 border-t border-line pt-6 text-sm">
                 {p.features.map((f) => (
                   <li key={f.text} className="flex gap-3">
-                    <svg
-                      className="mt-0.5 h-4 w-4 shrink-0 text-brand"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.8 3.8 6.8-6.8a1 1 0 0 1 1.4 0Z" />
+                    <svg className="mt-0.5 h-4 w-4 shrink-0 text-gold" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <circle cx="10" cy="10" r="8.25" stroke="currentColor" strokeWidth="1.5" />
+                      <path d="m6.5 10.2 2.3 2.3 4.7-4.9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     <span className="text-soft">
                       {f.text}
                       {f.soon && (
-                        <span className="ml-2 rounded bg-panel-4 px-1.5 py-0.5 text-[11px] font-bold uppercase text-white">
+                        <span className="ml-2 rounded border border-gold/30 bg-gold-soft px-1.5 py-0.5 font-mono text-[10px] uppercase text-gold">
                           Soon
                         </span>
                       )}
